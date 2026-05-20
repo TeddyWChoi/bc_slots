@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<!-- timer styles injected -->
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BC Slot – BlackShot Gacha</title>
+  <link rel="stylesheet" href="css/style.css?v=21">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    .spin-auto-panel {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background: rgba(26, 4, 4, 0.98) !important;
+      border: 2px solid rgba(212, 175, 55, 0.7) !important;
+      border-radius: 50% !important;
+      width: 92px !important;
+      height: 92px !important;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(0, 0, 0, 0.8) !important;
+      pointer-events: none !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      z-index: 999 !important;
+    }
+
+    .spin-autospin-left {
+      font-weight: 900 !important;
+      font-size: 32px !important;
+      color: #ffd700 !important;
+      line-height: 1.1 !important;
+      text-shadow: 0 0 6px rgba(255, 215, 0, 0.4) !important;
+    }
+
+    .spin-autospin-label {
+      font-weight: 700 !important;
+      font-size: 9px !important;
+      color: rgba(255, 255, 255, 0.6) !important;
+      letter-spacing: 1px !important;
+      margin-top: 2px !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+
+    <!-- ── 배경 이미지 ── -->
+    <div class="bg-layer">
+      <img src="assets/bg.png" alt="" onerror="this.style.display='none'">
+      <div class="bg-overlay"></div>
+    </div>
+
+    <!-- ── 헤더 ── -->
+    <header class="app-header">
+      <div class="header-logo">
+        <img src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">
+      </div>
+      <div class="header-title">
+        <img src="assets/title.png" alt="BlackShot Slots" onerror="this.style.display='none'">
+      </div>
+      <div class="header-actions">
+        <button class="btn-signout">SIGN OUT</button>
+      </div>
+    </header>
+
+    <!-- ── 당첨자 배너 (정적 placeholder) ── -->
+
+    <!-- ── 당첨자 토스트 배너 ── -->
+    <div class="winner-banner-wrap">
+      <div class="winner-toast-container">
+        <transition name="toast">
+          <div v-if="toastVisible" class="winner-toast">
+            <p class="winner-toast-text">
+              <span>🏆 {{ currentWinner.date }} </span>
+              <strong style="color:#fff;">{{ currentWinner.nick }}</strong>
+              <span> 님이 </span>
+              <strong
+                :style="{ color: currentWinner.prize === 'MEGA JACKPOT' ? '#ffd700' : '#f87171', textShadow: currentWinner.prize === 'MEGA JACKPOT' ? '0 0 8px rgba(255,215,0,0.7)' : '0 0 8px rgba(248,113,113,0.7)' }">
+                {{ currentWinner.icon }} {{ currentWinner.prize }}
+              </strong>
+              <strong style="color:#fff;"> {{ currentWinner.multi }}</strong>
+              <span> 당첨!</span>
+            </p>
+          </div>
+        </transition>
+      </div>
+    </div>
+
+    <!-- ── 메인 레이아웃 ── -->
+    <div class="main-layout">
+
+      <!-- ──────── 좌측 패널 ──────── -->
+      <aside class="left-panel">
+
+        <!-- 화려한 인라인 페이테이블 -->
+        <div class="paytable-fancy">
+          <div class="paytable-fancy-header">
+            <span class="pf-icon">⚡</span>
+            <span class="pf-title">PAYTABLE</span>
+            <span class="pf-sub">3 of a kind</span>
+          </div>
+          <div class="paytable-fancy-grid">
+            <!-- MEGA -->
+            <div class="pf-card pf-tier-mega">
+              <div class="pf-glow-ring"></div>
+              <img src="assets/symbol1.png" class="pf-sym-img" alt="Crown">
+              <div class="pf-sym-mult">×1000</div>
+              <div class="pf-sym-name">MEGA</div>
+            </div>
+            <!-- JACKPOT -->
+            <div class="pf-card pf-tier-jackpot">
+              <div class="pf-glow-ring"></div>
+              <img src="assets/symbol3.png" class="pf-sym-img" alt="Skull">
+              <div class="pf-sym-mult">×100</div>
+              <div class="pf-sym-name">JACKPOT</div>
+            </div>
+            <!-- BIG -->
+            <div class="pf-card pf-tier-big">
+              <img src="assets/symbol7.png" class="pf-sym-img" alt="Smile">
+              <div class="pf-sym-mult">×50</div>
+              <div class="pf-sym-name">BIG</div>
+            </div>
+            <!-- MEDIUM 1 -->
+            <div class="pf-card pf-tier-med">
+              <img src="assets/symbol6.png" class="pf-sym-img" alt="Helmet">
+              <div class="pf-sym-mult">×25</div>
+              <div class="pf-sym-name">MED</div>
+            </div>
+            <!-- MEDIUM 2 -->
+            <div class="pf-card pf-tier-med">
+              <img src="assets/symbol5.png" class="pf-sym-img" alt="Knife">
+              <div class="pf-sym-mult">×15</div>
+              <div class="pf-sym-name">MED</div>
+            </div>
+            <!-- SMALL 1 -->
+            <div class="pf-card pf-tier-sm">
+              <img src="assets/symbol2.png" class="pf-sym-img" alt="Grenade">
+              <div class="pf-sym-mult">×8</div>
+              <div class="pf-sym-name">SMALL</div>
+            </div>
+            <!-- SMALL 2 -->
+            <div class="pf-card pf-tier-sm">
+              <img src="assets/symbol4.png" class="pf-sym-img" alt="Pistol">
+              <div class="pf-sym-mult">×5</div>
+              <div class="pf-sym-name">SMALL</div>
+            </div>
+          </div>
+          <div class="pf-bonus-row">
+            <span class="pf-bonus-item">👑×2 = ×10</span>
+            <span class="pf-bonus-divider">·</span>
+            <span class="pf-bonus-item">💀×2 = ×5</span>
+            <span class="pf-bonus-divider">·</span>
+            <span class="pf-bonus-item">😊×2 = ×2</span>
+          </div>
+        </div>
+
+
+        <!-- Character / BC 패널 -->
+        <div class="box-dark">
+
+          <!-- Character -->
+          <div class="panel-section">
+            <div class="label-gold">Character</div>
+            <div class="user-select-wrap" style="margin-top:0.4rem;">
+              <select v-model="selectedChar" class="user-select" :disabled="spinning">
+                <option v-for="ch in CHARACTERS" :key="ch.id" :value="ch.id">{{ ch.name }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- My BC -->
+          <div class="panel-section">
+            <div class="label-gold">My BC is...</div>
+            <div class="user-bc-display" style="margin-top:0.4rem;">
+              <span class="user-bc-val">{{ fmtNum(balance) }}</span>
+              <span class="user-bc-unit">BC</span>
+            </div>
+          </div>
+
+        </div>
+
+      </aside>
+
+      <!-- ──────── 중앙 슬롯 영역 ──────── -->
+      <main class="center-panel">
+
+        <!-- 메가잭팟 배너 -->
+        <img src="assets/megabanner.png" alt="MEGA JACKPOT SLOTS" class="mega-banner"
+          onerror="this.style.display='none'">
+
+        <!-- 슬롯 프레임 + 릴 -->
+        <div class="slot-container">
+          <img src="assets/slotframe.png" alt="Slot Frame" class="slot-frame-img" onerror="this.style.opacity='0'">
+
+          <div class="reel-aspect-wrapper">
+            <div class="reel-viewport" ref="reelViewport">
+              <div class="reel-inner" style="height: 290px">
+
+                <!-- 릴 3개 -->
+                <div v-for="(reel, colIdx) in reels" :key="colIdx" class="reel-col" style="height: 290px">
+                  <!-- 중앙 라인 -->
+                  <div
+                    style="position:absolute;left:0;right:0;z-index:10;pointer-events:none;border-top:1px solid rgba(255,215,0,0.2);border-bottom:1px solid rgba(255,215,0,0.2);"
+                    :style="{ top: cellH + 'px', height: cellH + 'px' }"></div>
+                  <!-- 당첨 하이라이트 -->
+                  <div v-if="winResult && reel.stopped"
+                    style="position:absolute;left:0;right:0;z-index:10;border-top:3px solid #ffd700;border-bottom:3px solid #ffd700;background:rgba(255,215,0,0.07);box-shadow:inset 0 0 30px rgba(255,215,0,0.35);pointer-events:none;"
+                    :style="{ top: cellH + 'px', height: cellH + 'px' }"></div>
+
+                  <div class="reel-strip" :style="{
+                    transform: 'translateY(' + reel.translateY + 'px)',
+                    transition: reel.transitioning ? 'transform 0.9s cubic-bezier(0.12,0.9,0.3,1)' : 'none',
+                    filter: reel.blurred ? 'blur(4px)' : 'none',
+                  }">
+                    <div v-for="(sym, rowIdx) in reel.strip" :key="rowIdx" class="sym-cell"
+                      :style="{ height: cellH + 'px' }">
+                      <div class="sym-inner"
+                        :style="{ width: Math.max(44, Math.min(cellH * 0.75, 92)) + 'px', height: Math.max(44, Math.min(cellH * 0.75, 92)) + 'px' }">
+                        <img v-if="sym.imgUrl" :src="sym.imgUrl" :style="imgStyle(sym, colIdx, rowIdx, reel)"
+                          :alt="sym.name">
+                        <span v-else :style="symStyle(sym, colIdx, rowIdx, reel)">{{ sym.emoji }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 하단 컨트롤 ── -->
+        <div class="bottom-controls">
+          <div class="control-grid">
+            <!-- 1열: I BET -->
+            <div class="ctrl-col col-bet">
+              <div class="ctrl-display">
+                <div class="ctrl-label">MY BET</div>
+                <div class="ctrl-val text-gold">{{ fmtNum(bet) }} BC</div>
+              </div>
+              <div class="ctrl-actions">
+                <div class="bet-adj-row">
+                  <button class="btn-ctrl-sq" @click="changeBet(-1)" :disabled="spinning">−</button>
+                  <input type="number" class="bet-ctrl-input" v-model="betInput" :min="10" :max="1000" :disabled="spinning" @change="setBetFromInput" @blur="setBetFromInput">
+                  <button class="btn-ctrl-sq" @click="changeBet(1)" :disabled="spinning">+</button>
+                </div>
+                <button class="btn-ctrl-wide btn-max" @click="handleMaxBet" :disabled="spinning">MAX BET</button>
+              </div>
+            </div>
+
+            <!-- 2열: SESSION BUDGET -->
+            <div class="ctrl-col col-budget">
+              <div class="ctrl-display">
+                <div class="ctrl-label">SESSION BUDGET</div>
+                <div class="ctrl-val text-white">{{ fmtNum(sessionBudget) }} BC</div>
+              </div>
+              <div class="ctrl-actions">
+                <div class="budget-btn-row">
+                  <button class="btn-ctrl-sq" @click="budgetInput = 1000" :disabled="spinning">1K</button>
+                  <button class="btn-ctrl-sq" @click="budgetInput = 3000" :disabled="spinning">3K</button>
+                  <button class="btn-ctrl-sq" @click="budgetInput = 5000" :disabled="spinning">5K</button>
+                  <input type="number" class="budget-ctrl-input" v-model="budgetInput" placeholder="입력" :disabled="spinning">
+                </div>
+                <div class="budget-btn-row">
+                  <button class="btn-ctrl-wide btn-deposit" @click="depositBudget" :disabled="spinning">예치 ▶</button>
+                  <button class="btn-ctrl-wide btn-cashout" @click="cashoutBudget" :disabled="spinning || sessionBudget <= 0">정산 ✓</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3열: WIN & 스핀조작 -->
+            <div class="ctrl-col col-spin">
+              <div class="ctrl-display">
+                <div class="ctrl-label">LAST WIN</div>
+                <div class="ctrl-val text-green">{{ lastWinAmt > 0 ? '+' + fmtNum(lastWinAmt) : '0' }} BC</div>
+              </div>
+              <div class="ctrl-actions spin-actions">
+                <button class="btn-auto" :class="{ active: autoActive }" @click="toggleAuto">
+                  <span class="auto-txt">AUTO</span>
+                  <span class="auto-status">{{ autoActive ? 'ON' : 'OFF' }}</span>
+                </button>
+                <button class="btn-spin-sq" :class="{ active: spinning }" @click="handleSpinClick" :disabled="spinning">
+                  SPIN
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 이벤트 타이머 -->
+        <div class="event-timer-wrap">
+          <div class="evt-timer-box">
+            <div class="evt-timer-header">Mar.01 2026 to Mar.31 2026(CET)</div>
+            <div class="evt-timer-digits">
+              <div class="evt-digit-group">
+                <div class="evt-digit">{{ fmtTime(timerD || 22) }}</div>
+                <div class="evt-digit-label">DAYS</div>
+              </div>
+              <div class="evt-colon">:</div>
+              <div class="evt-digit-group">
+                <div class="evt-digit">{{ fmtTime(timerH) }}</div>
+                <div class="evt-digit-label">HOURS</div>
+              </div>
+              <div class="evt-colon">:</div>
+              <div class="evt-digit-group">
+                <div class="evt-digit">{{ fmtTime(timerM) }}</div>
+                <div class="evt-digit-label">MINS</div>
+              </div>
+              <div class="evt-colon">:</div>
+              <div class="evt-digit-group">
+                <div class="evt-digit">{{ fmtTime(timerS) }}</div>
+                <div class="evt-digit-label">SECS</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- ──────── 우측 캐릭터 ──────── -->
+      <aside class="right-panel">
+        <img src="assets/character.png" class="character-img" alt="Character" onerror="this.style.display='none'">
+      </aside>
+
+    </div><!-- /main-layout -->
+
+    <!-- ── 하단 주의사항 ── -->
+    <section class="notice-section">
+      <div class="notice-inner">
+        <div class="notice-header">
+          <p class="notice-title">BC Gacha Betting Guide</p>
+          <div class="notice-btns">
+            <button class="btn-notice" @click="showHistory = true">HISTORY</button>
+          </div>
+        </div>
+        <div class="notice-body">
+          <div>
+            <p class="notice-rule-title">📌 Betting Rules</p>
+            <ul class="notice-rule-list">
+              <li>You can bet between 10 and 1,000 BC per spin.</li>
+              <li>Winnings are paid out as a multiplier (5x – 1,000x) of your bet amount.</li>
+              <li>After each spin, you must wait a set amount of time before spinning again.</li>
+            </ul>
+          </div>
+          <div>
+            <p class="notice-rule-title">⚠️ Important Notice</p>
+            <ul class="notice-rule-list">
+              <li>All results are determined by a certified random number generator.</li>
+              <li>BC is a virtual in-game currency and cannot be exchanged for real money.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 당첨 오버레이 ── -->
+    <transition name="fade">
+      <div v-if="showWin" class="win-overlay">
+        <div class="win-text-wrap">
+          <div class="win-title">YOU WIN!</div>
+          <div class="win-amount">+ {{ fmtNum(lastWinAmt) }} BC</div>
+        </div>
+      </div>
+    </transition>
+
+
+    <!-- ── HISTORY 팝업 ── -->
+    <transition name="fade">
+      <div v-if="showHistory" class="backdrop" @click.self="showHistory = false">
+        <div class="popup-box" @click.stop>
+          <h2 class="popup-title">SPIN HISTORY</h2>
+          <div class="popup-list">
+            <div v-if="history.length === 0" class="history-empty">No history yet.</div>
+            <div v-for="rec in history" :key="rec.id" class="history-row">
+              <div>
+                <div class="history-date">{{ rec.date }}</div>
+                <div class="history-bet">Bet: {{ fmtNum(rec.bet) }} BC</div>
+              </div>
+              <div :style="{ color: rec.winAmount > 0 ? '#22c55e' : '#f87171', fontWeight: 900, fontSize: '14px' }">
+                {{ rec.winAmount > 0 ? '+' + fmtNum(rec.winAmount) : '-' + fmtNum(rec.bet) }}
+              </div>
+            </div>
+          </div>
+          <button class="popup-close" @click="showHistory = false">CLOSE</button>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Alert Popup -->
+    <transition name="fade">
+      <div v-if="showAlert" class="backdrop" @click.self="showAlert = false">
+        <div class="popup-box alert-box" @click.stop>
+          <button class="btn-close-x" @click="showAlert = false">×</button>
+          <h2 class="popup-title text-red-500">Notice</h2>
+          <div class="alert-msg">{{ alertMessage }}</div>
+        </div>
+      </div>
+    </transition>
+
+  </div><!-- /#app -->
+  <script src="js/app.js?v=11"></script>
+</body>
+
+</html>
