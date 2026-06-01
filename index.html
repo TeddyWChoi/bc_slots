@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BC Slot – BlackShot Gacha</title>
-  <link rel="stylesheet" href="css/style.css?v=21">
+  <link rel="stylesheet" href="css/style.css?v=27">
   <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <style>
@@ -56,8 +56,7 @@
       <div class="bg-overlay"></div>
     </div>
 
-    <!-- ── 헤더 ── -->
-    <header class="app-header">
+    <header class="app-header" :class="{ 'test-mode-active': gameMode === 'test' }">
       <div class="header-logo">
         <img src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">
       </div>
@@ -65,9 +64,32 @@
         <img src="assets/title.png" alt="BlackShot Slots" onerror="this.style.display='none'">
       </div>
       <div class="header-actions">
-        <button class="btn-signout">SIGN OUT</button>
+        <button :class="isLoggedIn ? 'btn-signout' : 'btn-signin'" @click="toggleLogin">
+          {{ isLoggedIn ? 'SIGN OUT' : 'SIGN IN' }}
+        </button>
+      </div>
+      <!-- MODE TOGGLE: absolute 포지션, 레이아웃에 영향 없음 -->
+      <div class="mode-toggle-pill">
+        <span class="mode-toggle-label">MODE</span>
+        <button
+          class="mode-toggle-btn"
+          data-mode="test"
+          :class="{ active: gameMode === 'test' }"
+          @click="gameMode = 'test'"
+        >
+          <span class="mode-dot"></span>TEST
+        </button>
+        <button
+          class="mode-toggle-btn"
+          data-mode="normal"
+          :class="{ active: gameMode === 'normal' }"
+          @click="gameMode = 'normal'"
+        >
+          <span class="mode-dot"></span>NORMAL
+        </button>
       </div>
     </header>
+
 
     <!-- ── 당첨자 배너 (정적 placeholder) ── -->
 
@@ -103,7 +125,7 @@
           <div class="paytable-fancy-header">
             <span class="pf-icon">⚡</span>
             <span class="pf-title">PAYTABLE</span>
-            <span class="pf-sub">3 of a kind</span>
+            <span class="pf-sub">3 of a kind · 2 of a kind</span>
           </div>
           <div class="paytable-fancy-grid">
             <!-- MEGA -->
@@ -124,7 +146,7 @@
             <div class="pf-card pf-tier-big">
               <img src="assets/symbol7.png" class="pf-sym-img" alt="Smile">
               <div class="pf-sym-mult">×50</div>
-              <div class="pf-sym-name">BIG</div>
+              <div class="pf-sym-name">BIG WIN</div>
             </div>
             <!-- MEDIUM 1 -->
             <div class="pf-card pf-tier-med">
@@ -151,6 +173,7 @@
               <div class="pf-sym-name">SMALL</div>
             </div>
           </div>
+          <!-- 2매치 당첨 -->
           <div class="pf-bonus-row">
             <span class="pf-bonus-item">👑×2 = ×10</span>
             <span class="pf-bonus-divider">·</span>
@@ -158,17 +181,31 @@
             <span class="pf-bonus-divider">·</span>
             <span class="pf-bonus-item">😊×2 = ×2</span>
           </div>
+          <!-- 2매치 본전 (BREAK EVEN) -->
+          <div class="pf-bonus-row" style="margin-top: 4px; padding-top: 4px;">
+            <span class="pf-bonus-item" style="color: #94a3b8; font-size: 0.72rem; opacity: 0.85;">🪖🗡💣🔫 ×2 = ×1 BREAK EVEN</span>
+          </div>
+          <!-- 스페셜 콤보 -->
+          <div class="pf-bonus-row" style="margin-top: 4px; padding-top: 4px;">
+            <span class="pf-bonus-item" style="color: #ffd700; text-shadow: 0 0 5px rgba(255, 215, 0, 0.35);">👑💀👑 = ×200</span>
+            <span class="pf-bonus-divider">·</span>
+            <span class="pf-bonus-item" style="color: #f87171; text-shadow: 0 0 5px rgba(248, 113, 113, 0.35);">💀😊💀 = ×50</span>
+          </div>
+          <!-- 프리스핀 -->
+          <div class="pf-bonus-row" style="margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(168,85,247,0.25);">
+            <span class="pf-bonus-item" style="color: #c084fc; text-shadow: 0 0 6px rgba(168,85,247,0.5);">❓ = FREE SPIN</span>
+          </div>
         </div>
 
 
         <!-- Character / BC 패널 -->
         <div class="box-dark">
-
           <!-- Character -->
           <div class="panel-section">
             <div class="label-gold">Character</div>
             <div class="user-select-wrap" style="margin-top:0.4rem;">
-              <select v-model="selectedChar" class="user-select" :disabled="spinning">
+              <select v-model="selectedChar" class="user-select" :disabled="spinning || !isLoggedIn">
+                <option v-if="!isLoggedIn" value="">LOCKED</option>
                 <option v-for="ch in CHARACTERS" :key="ch.id" :value="ch.id">{{ ch.name }}</option>
               </select>
             </div>
@@ -178,11 +215,17 @@
           <div class="panel-section">
             <div class="label-gold">My BC is...</div>
             <div class="user-bc-display" style="margin-top:0.4rem;">
-              <span class="user-bc-val">{{ fmtNum(balance) }}</span>
-              <span class="user-bc-unit">BC</span>
+              <span v-if="isLoggedIn" class="user-bc-val">{{ fmtNum(balance) }}</span>
+              <span v-if="isLoggedIn" class="user-bc-unit">BC</span>
+              <span v-else style="color: rgba(220,180,180,0.4); font-size: 0.8rem; font-weight: 700;">LOCKED</span>
             </div>
           </div>
 
+          <!-- Lock Overlay -->
+          <div v-if="!isLoggedIn" class="locked-overlay-mini">
+            <div class="locked-overlay-mini-icon">🔒</div>
+            <div class="locked-overlay-mini-text">LOCKED</div>
+          </div>
         </div>
 
       </aside>
@@ -200,10 +243,10 @@
 
           <div class="reel-aspect-wrapper">
             <div class="reel-viewport" ref="reelViewport">
-              <div class="reel-inner" style="height: 290px">
+              <div class="reel-inner">
 
                 <!-- 릴 3개 -->
-                <div v-for="(reel, colIdx) in reels" :key="colIdx" class="reel-col" style="height: 290px">
+                <div v-for="(reel, colIdx) in reels" :key="colIdx" class="reel-col">
                   <!-- 중앙 라인 -->
                   <div
                     style="position:absolute;left:0;right:0;z-index:10;pointer-events:none;border-top:1px solid rgba(255,215,0,0.2);border-bottom:1px solid rgba(255,215,0,0.2);"
@@ -233,63 +276,71 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- ── 하단 컨트롤 ── -->
-        <div class="bottom-controls">
-          <div class="control-grid">
-            <!-- 1열: I BET -->
-            <div class="ctrl-col col-bet">
-              <div class="ctrl-display">
-                <div class="ctrl-label">MY BET</div>
-                <div class="ctrl-val text-gold">{{ fmtNum(bet) }} BC</div>
-              </div>
-              <div class="ctrl-actions">
-                <div class="bet-adj-row">
-                  <button class="btn-ctrl-sq" @click="changeBet(-1)" :disabled="spinning">−</button>
-                  <input type="number" class="bet-ctrl-input" v-model="betInput" :min="10" :max="1000" :disabled="spinning" @change="setBetFromInput" @blur="setBetFromInput">
-                  <button class="btn-ctrl-sq" @click="changeBet(1)" :disabled="spinning">+</button>
+          <!-- ── 하단 컨트롤 ── -->
+          <div class="bottom-controls">
+            <div class="control-grid">
+              <!-- 1열: I BET -->
+              <div class="ctrl-col col-bet">
+                <div class="ctrl-display">
+                  <div class="ctrl-label">MY BET</div>
+                  <div class="ctrl-val text-gold">{{ fmtNum(bet) }} BC</div>
                 </div>
-                <button class="btn-ctrl-wide btn-max" @click="handleMaxBet" :disabled="spinning">MAX BET</button>
-              </div>
-            </div>
-
-            <!-- 2열: SESSION BUDGET -->
-            <div class="ctrl-col col-budget">
-              <div class="ctrl-display">
-                <div class="ctrl-label">SESSION BUDGET</div>
-                <div class="ctrl-val text-white">{{ fmtNum(sessionBudget) }} BC</div>
-              </div>
-              <div class="ctrl-actions">
-                <div class="budget-btn-row">
-                  <button class="btn-ctrl-sq" @click="budgetInput = 1000" :disabled="spinning">1K</button>
-                  <button class="btn-ctrl-sq" @click="budgetInput = 3000" :disabled="spinning">3K</button>
-                  <button class="btn-ctrl-sq" @click="budgetInput = 5000" :disabled="spinning">5K</button>
-                  <input type="number" class="budget-ctrl-input" v-model="budgetInput" placeholder="입력" :disabled="spinning">
-                </div>
-                <div class="budget-btn-row">
-                  <button class="btn-ctrl-wide btn-deposit" @click="depositBudget" :disabled="spinning">예치 ▶</button>
-                  <button class="btn-ctrl-wide btn-cashout" @click="cashoutBudget" :disabled="spinning || sessionBudget <= 0">정산 ✓</button>
+                <div class="ctrl-actions">
+                  <div class="bet-adj-row">
+                    <button class="btn-ctrl-sq" @click="changeBet(-1)" :disabled="spinning">−</button>
+                    <input type="number" class="bet-ctrl-input" v-model="betInput" :min="10" :max="1000" :disabled="spinning" @change="setBetFromInput" @blur="setBetFromInput">
+                    <button class="btn-ctrl-sq" @click="changeBet(1)" :disabled="spinning">+</button>
+                  </div>
+                  <button class="btn-ctrl-wide btn-max" @click="handleMaxBet" :disabled="spinning">MAX BET</button>
                 </div>
               </div>
-            </div>
 
-            <!-- 3열: WIN & 스핀조작 -->
-            <div class="ctrl-col col-spin">
-              <div class="ctrl-display">
-                <div class="ctrl-label">LAST WIN</div>
-                <div class="ctrl-val text-green">{{ lastWinAmt > 0 ? '+' + fmtNum(lastWinAmt) : '0' }} BC</div>
+              <!-- 2열: SESSION BUDGET -->
+              <div class="ctrl-col col-budget">
+                <div class="ctrl-display">
+                  <div class="ctrl-label">SESSION BUDGET</div>
+                  <div class="ctrl-val text-white">{{ fmtNum(sessionBudget) }} BC</div>
+                </div>
+                <div class="ctrl-actions">
+                  <div class="budget-btn-row">
+                    <button class="btn-ctrl-sq" @click="budgetInput = 1000" :disabled="spinning">1K</button>
+                    <button class="btn-ctrl-sq" @click="budgetInput = 3000" :disabled="spinning">3K</button>
+                    <button class="btn-ctrl-sq" @click="budgetInput = 5000" :disabled="spinning">5K</button>
+                    <input type="number" class="budget-ctrl-input" v-model="budgetInput" placeholder="입력" :disabled="spinning">
+                  </div>
+                  <div class="budget-btn-row">
+                    <button class="btn-ctrl-wide btn-deposit" @click="depositBudget" :disabled="spinning">예치 ▶</button>
+                    <button class="btn-ctrl-wide btn-cashout" @click="cashoutBudget" :disabled="spinning || sessionBudget <= 0">정산 ✓</button>
+                  </div>
+                </div>
               </div>
-              <div class="ctrl-actions spin-actions">
-                <button class="btn-auto" :class="{ active: autoActive }" @click="toggleAuto">
-                  <span class="auto-txt">AUTO</span>
-                  <span class="auto-status">{{ autoActive ? 'ON' : 'OFF' }}</span>
-                </button>
-                <button class="btn-spin-sq" :class="{ active: spinning }" @click="handleSpinClick" :disabled="spinning">
-                  SPIN
-                </button>
+
+              <!-- 3열: WIN & 스핀조작 -->
+              <div class="ctrl-col col-spin">
+                <div class="ctrl-display">
+                  <div class="ctrl-label">LAST WIN</div>
+                  <div class="ctrl-val text-green">{{ lastWinAmt > 0 ? '+' + fmtNum(lastWinAmt) : '0' }} BC</div>
+                </div>
+                <div class="ctrl-actions spin-actions">
+                  <button class="btn-auto" :class="{ active: autoActive }" @click="toggleAuto">
+                    <span class="auto-txt">AUTO</span>
+                    <span class="auto-status">{{ autoActive ? 'ON' : 'OFF' }}</span>
+                  </button>
+                  <button class="btn-spin-sq" :class="{ active: spinning }" @click="handleSpinClick" :disabled="spinning">
+                    SPIN
+                  </button>
               </div>
             </div>
+          </div>
+
+          <!-- Lock Overlay -->
+          <div v-if="!isLoggedIn" class="locked-overlay">
+            <div class="locked-overlay-content">
+              <div class="locked-overlay-icon">🔒</div>
+              <div class="locked-overlay-text">PLEASE SIGN IN FIRST TO SPIN</div>
+            </div>
+          </div>
           </div>
         </div>
 
@@ -325,7 +376,7 @@
 
       <!-- ──────── 우측 캐릭터 ──────── -->
       <aside class="right-panel">
-        <img src="assets/character.png" class="character-img" alt="Character" onerror="this.style.display='none'">
+        <img v-if="isLoggedIn && currentCharacter" :src="currentCharacter" class="character-img" alt="Character">
       </aside>
 
     </div><!-- /main-layout -->
@@ -336,16 +387,17 @@
         <div class="notice-header">
           <p class="notice-title">BC Gacha Betting Guide</p>
           <div class="notice-btns">
-            <button class="btn-notice" @click="showHistory = true">HISTORY</button>
+            <button class="btn-notice" :disabled="!isLoggedIn" @click="showHistory = true">HISTORY</button>
           </div>
         </div>
         <div class="notice-body">
           <div>
             <p class="notice-rule-title">📌 Betting Rules</p>
             <ul class="notice-rule-list">
-              <li>You can bet between 10 and 1,000 BC per spin.</li>
-              <li>Winnings are paid out as a multiplier (5x – 1,000x) of your bet amount.</li>
-              <li>After each spin, you must wait a set amount of time before spinning again.</li>
+              <li>Three of a Kind pays out according to the payout table.</li>
+              <li>Two of a Kind (Smile, Skull, Crown) pays matching multipliers.</li>
+              <li>Confetti and sound effects scale with win intensity.</li>
+              <li>BC is a virtual in-game currency and cannot be exchanged for real money.</li>
             </ul>
           </div>
           <div>
@@ -359,18 +411,76 @@
       </div>
     </section>
 
-    <!-- ── 당첨 오버레이 ── -->
+    <!-- ── 코인 비 효과 ── -->
+    <div class="coin-rain-container" v-if="showCoinRain">
+      <div v-for="coin in coins" :key="coin.id" class="coin-particle" :style="coin.style">
+        <img src="assets/bc.png" alt="BC Coin">
+      </div>
+    </div>
+
+    <!-- ── 재스핀 오버레이 ── -->
     <transition name="fade">
-      <div v-if="showWin" class="win-overlay">
-        <div class="win-text-wrap">
-          <div class="win-title">YOU WIN!</div>
-          <div class="win-amount">+ {{ fmtNum(lastWinAmt) }} BC</div>
+      <div v-if="showRespinOverlay" class="respin-overlay">
+        <div class="respin-text-wrap">
+          <div class="respin-title">FREE RESPIN!</div>
+          <div class="respin-center-icon">❓</div>
+          <div class="respin-subtitle">Good Luck!</div>
         </div>
       </div>
     </transition>
 
+    <!-- ── 당첨 오버레이 ── -->
+    <transition name="fade">
+      <div v-if="showWin" class="win-overlay" @click.self="confirmWin">
+        <div class="win-box-popup">
+          <div class="win-title" :class="winResult ? 'tier-' + winResult.tier : 'tier-small'">
+            {{ winResult ? (
+              winResult.tier === 'mega' ? 'MEGA JACKPOT' :
+              winResult.tier === 'jackpot' ? 'JACKPOT' :
+              winResult.tier === 'big' ? 'BIG WIN' : 'WIN'
+            ) : 'WIN' }}
+          </div>
+          
+          <!-- 당첨 금액 상세 -->
+          <div class="win-details">
+            <p class="win-detail-bet">You bet <span class="text-gold">{{ fmtNum(bet) }} BC</span> x{{ winResult ? winResult.multiplier : 0 }}</p>
+            <p class="win-detail-earn">You Earn <span class="text-gold-highlight">{{ fmtNum(lastWinAmt) }} BC</span></p>
+          </div>
+          
+          <!-- 클레임 버튼 -->
+          <button class="btn-win-claim" @click="confirmWin">CLAIM</button>
+        </div>
+      </div>
+    </transition>
 
-    <!-- ── HISTORY 팝업 ── -->
+    <!-- ── 꽝(Lose) 오버레이 ── -->
+    <transition name="fade">
+      <div v-if="showLose" class="lose-overlay" @click.self="confirmLose">
+        <div class="lose-box-popup">
+          <div class="lose-title">TRY AGAIN</div>
+          <div class="lose-details">
+            <p class="lose-detail-bet">You bet <span class="text-red-highlight">{{ fmtNum(bet) }} BC</span></p>
+            <p class="lose-detail-msg">Better luck next time!</p>
+          </div>
+          <button class="btn-lose-confirm" @click="confirmLose">OK</button>
+        </div>
+      </div>
+    </transition>
+
+    <!-- ── BREAK EVEN 오버레이 ── -->
+    <transition name="fade">
+      <div v-if="showBreakEven" class="breakeven-overlay" @click.self="confirmBreakEven">
+        <div class="breakeven-box-popup">
+          <div class="breakeven-title">BREAK EVEN</div>
+          <div class="breakeven-details">
+            <p class="breakeven-detail-bet">Your bet <span class="text-slate-highlight">{{ fmtNum(bet) }} BC</span> returned</p>
+            <p class="breakeven-detail-msg">No loss, no gain. Spin again!</p>
+          </div>
+          <button class="btn-breakeven-confirm" @click="confirmBreakEven">OK</button>
+        </div>
+      </div>
+    </transition>
+
     <transition name="fade">
       <div v-if="showHistory" class="backdrop" @click.self="showHistory = false">
         <div class="popup-box" @click.stop>
@@ -404,7 +514,7 @@
     </transition>
 
   </div><!-- /#app -->
-  <script src="js/app.js?v=11"></script>
+  <script src="js/app.js?v=18"></script>
 </body>
 
 </html>
