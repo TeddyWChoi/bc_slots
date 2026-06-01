@@ -347,7 +347,7 @@ new Vue({
       gameMode: 'normal', // 'normal' | 'test'
       displayWin: 0,
       lastWinAmt: 0,
-      currentCharacter: '',
+      currentCharacter: 'assets/character.png',
       showCoinRain: false,
       coins: [],
       showRespinOverlay: false,
@@ -898,7 +898,7 @@ new Vue({
         // Sign Out
         this.isLoggedIn = false;
         this.selectedChar = '';
-        this.currentCharacter = '';
+        this.currentCharacter = 'assets/character.png';
         this.autoActive = false; // Turn off auto spin if active
       } else {
         // Sign In
