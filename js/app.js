@@ -2,14 +2,14 @@
 // 심볼 & 배당 데이터
 // ============================================================================
 const SYMBOLS = [
-  { id: 'pistol',  emoji: '🔫', name: '권총',   weight: 35, color: '#94a3b8', glow: 'rgba(148,163,184,0.6)', imgUrl: 'assets/symbol4.png' },
-  { id: 'grenade', emoji: '💣', name: '수류탄', weight: 28, color: '#f59e0b', glow: 'rgba(245,158,11,0.6)',  imgUrl: 'assets/symbol2.png' },
-  { id: 'knife',   emoji: '🔪', name: '나이프', weight: 18, color: '#ef4444', glow: 'rgba(239,68,68,0.6)',   imgUrl: 'assets/symbol5.png' },
-  { id: 'helmet',  emoji: '🪖', name: '헬멧',   weight: 10, color: '#22c55e', glow: 'rgba(34,197,94,0.6)',   imgUrl: 'assets/symbol6.png' },
-  { id: 'smile',   emoji: '😊', name: '스마일', weight: 5,  color: '#fbbf24', glow: 'rgba(251,191,36,0.8)',  imgUrl: 'assets/symbol7.png' },
-  { id: 'skull',   emoji: '💀', name: '해골',   weight: 3,  color: '#f87171', glow: 'rgba(248,113,113,0.9)', imgUrl: 'assets/symbol3.png' },
-  { id: 'crown',   emoji: '👑', name: '크라운', weight: 1,  color: '#ffd700', glow: 'rgba(255,215,0,1)',     imgUrl: 'assets/symbol1.png' },
-  { id: 'mystery', emoji: '❓', name: '재스핀', weight: 6,  color: '#a855f7', glow: 'rgba(168,85,247,0.7)', imgUrl: '' },
+  { id: 'pistol',  emoji: '🔫', name: 'Pistol',  weight: 35, color: '#94a3b8', glow: 'rgba(148,163,184,0.6)', imgUrl: 'assets/symbol4.png' },
+  { id: 'grenade', emoji: '💣', name: 'Grenade', weight: 28, color: '#f59e0b', glow: 'rgba(245,158,11,0.6)',  imgUrl: 'assets/symbol2.png' },
+  { id: 'knife',   emoji: '🔪', name: 'Knife',   weight: 18, color: '#ef4444', glow: 'rgba(239,68,68,0.6)',   imgUrl: 'assets/symbol5.png' },
+  { id: 'helmet',  emoji: '🪖', name: 'Helmet',  weight: 10, color: '#22c55e', glow: 'rgba(34,197,94,0.6)',   imgUrl: 'assets/symbol6.png' },
+  { id: 'smile',   emoji: '😊', name: 'Smile',   weight: 5,  color: '#fbbf24', glow: 'rgba(251,191,36,0.8)',  imgUrl: 'assets/symbol7.png' },
+  { id: 'skull',   emoji: '💀', name: 'Skull',   weight: 3,  color: '#f87171', glow: 'rgba(248,113,113,0.9)', imgUrl: 'assets/symbol3.png' },
+  { id: 'crown',   emoji: '👑', name: 'Crown',   weight: 1,  color: '#ffd700', glow: 'rgba(255,215,0,1)',     imgUrl: 'assets/symbol1.png' },
+  { id: 'mystery', emoji: '❓', name: 'Respin',  weight: 6,  color: '#a855f7', glow: 'rgba(168,85,247,0.7)', imgUrl: '' },
 ];
 
 const THREE_OF_A_KIND = {
@@ -342,6 +342,7 @@ new Vue({
       betAmount:    100,
       betInput:     '100',
       spinning: false,
+      handleReturning: false,
       finalReels: null,
       winResult: null,
       showWin: false,
@@ -551,6 +552,15 @@ new Vue({
       this.doSpin();
       sound.playClick();
     },
+    handleHandleClick() {
+      if (this.spinning || this._spinLock) return;
+      if (!this.isLoggedIn) {
+        this.alertMessage = "PLEASE SIGN IN FIRST TO SPIN";
+        this.showAlert = true;
+        return;
+      }
+      this.handleSpinClick();
+    },
 
     // ── 핵심 스핀 로직 ──
     doSpin(isFree = false) {
@@ -571,6 +581,8 @@ new Vue({
       clearTimeout(this._respinTimeout);
 
       this.spinning = true;
+      this.handleReturning = false;
+
       this.winResult = null;
       this.showWin = false;
       this.showLose = false;
@@ -651,6 +663,10 @@ new Vue({
     // ── 전체 릴 정지 후 처리 ──
     _onAllStopped(fr) {
       this.spinning = false;
+      this.handleReturning = true;
+      setTimeout(() => {
+        this.handleReturning = false;
+      }, 500);
       sound.stopSpinLoop();
       const result = calculateWin(fr, this.bet);
       this.winResult = result;
