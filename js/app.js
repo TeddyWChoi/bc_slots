@@ -96,6 +96,8 @@ const MIN_BET = 10;
 const MAX_BET = 1000;
 const BET_OPTIONS = [10, 50, 100, 300, 500, 1000];
 const INITIAL_BALANCE = 60000;
+const LOSE_AUTO_DELAY = 1200;
+const BREAK_AUTO_DELAY = 1200;
 
 const CHARACTERS = [
   { id: 'teddy',   name: 'Teddy'   },
@@ -671,7 +673,7 @@ new Vue({
           if (this.autoActive) {
             this._loseHideTimeout = setTimeout(() => {
               this.confirmBreakEven();
-            }, 1200);
+            }, BREAK_AUTO_DELAY);
           }
           this._spinLock = false;
           return;
@@ -698,7 +700,7 @@ new Vue({
         if (this.autoActive) {
           this._loseHideTimeout = setTimeout(() => {
             this.confirmLose();
-          }, 1200); // 1.2초 후 자동으로 닫히고 다음 스핀 진행
+          }, LOSE_AUTO_DELAY); // LOSE_AUTO_DELAY 후 자동으로 닫히고 다음 스핀 진행
         }
       }
       this._spinLock = false;

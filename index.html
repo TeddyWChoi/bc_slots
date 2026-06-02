@@ -327,7 +327,7 @@
                     <span class="auto-txt">AUTO</span>
                     <span class="auto-status">{{ autoActive ? 'ON' : 'OFF' }}</span>
                   </button>
-                  <button class="btn-spin-sq" :class="{ active: spinning }" @click="handleSpinClick" :disabled="spinning">
+                  <button class="btn-spin-sq" :class="{ active: spinning }" @click="handleSpinClick" :disabled="spinning || (isLoggedIn && sessionBudget < bet)">
                     SPIN
                   </button>
               </div>
@@ -422,9 +422,9 @@
     <transition name="fade">
       <div v-if="showRespinOverlay" class="respin-overlay">
         <div class="respin-text-wrap">
-          <div class="respin-title">FREE RESPIN!</div>
+          <div class="respin-title">FREE SPIN!</div>
           <div class="respin-center-icon">❓</div>
-          <div class="respin-subtitle">Mystery awaits — Spin for free!</div>
+          <div class="respin-subtitle">한 번 더!</div>
         </div>
       </div>
     </transition>
@@ -458,7 +458,7 @@
     <transition name="fade">
       <div v-if="showLose" class="lose-overlay" @click.self="confirmLose">
         <div class="lose-box-popup">
-          <div class="lose-title">TRY AGAIN</div>
+          <div class="lose-title">Miss</div>
           <div class="lose-details">
             <p class="lose-detail-bet">You bet <span class="text-red-highlight">{{ fmtNum(bet) }} BC</span></p>
             <p class="lose-detail-msg">Not this time. Try again!</p>
@@ -472,7 +472,7 @@
     <transition name="fade">
       <div v-if="showBreakEven" class="breakeven-overlay" @click.self="confirmBreakEven">
         <div class="breakeven-box-popup">
-          <div class="breakeven-title">BREAK EVEN</div>
+          <div class="breakeven-title">BREAK EVEN.</div>
           <div class="breakeven-details">
             <p class="breakeven-detail-bet">Your bet <span class="text-slate-highlight">{{ fmtNum(bet) }} BC</span> returned</p>
             <p class="breakeven-detail-msg">Close one! Your bet is back.</p>

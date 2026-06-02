@@ -2000,6 +2000,14 @@ ul {
   box-shadow: 0 0 20px rgba(248, 113, 113, 0.8);
 }
 
+.btn-spin-sq:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.65);
+  box-shadow: none;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
 /* ===== ALERT POPUP ===== */
 .alert-box {
   max-width: 320px;
