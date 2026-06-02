@@ -424,7 +424,7 @@
         <div class="respin-text-wrap">
           <div class="respin-title">FREE RESPIN!</div>
           <div class="respin-center-icon">❓</div>
-          <div class="respin-subtitle">Good Luck!</div>
+          <div class="respin-subtitle">Mystery awaits — Spin for free!</div>
         </div>
       </div>
     </transition>
@@ -445,6 +445,7 @@
           <div class="win-details">
             <p class="win-detail-bet">You bet <span class="text-gold">{{ fmtNum(bet) }} BC</span> x{{ winResult ? winResult.multiplier : 0 }}</p>
             <p class="win-detail-earn">You Earn <span class="text-gold-highlight">{{ fmtNum(lastWinAmt) }} BC</span></p>
+            <p class="win-detail-msg" v-if="winResult">{{ getWinMsgText(winResult.tier) }}</p>
           </div>
           
           <!-- 클레임 버튼 -->
@@ -460,7 +461,7 @@
           <div class="lose-title">TRY AGAIN</div>
           <div class="lose-details">
             <p class="lose-detail-bet">You bet <span class="text-red-highlight">{{ fmtNum(bet) }} BC</span></p>
-            <p class="lose-detail-msg">Better luck next time!</p>
+            <p class="lose-detail-msg">Not this time. Try again!</p>
           </div>
           <button class="btn-lose-confirm" @click="confirmLose">OK</button>
         </div>
@@ -474,7 +475,7 @@
           <div class="breakeven-title">BREAK EVEN</div>
           <div class="breakeven-details">
             <p class="breakeven-detail-bet">Your bet <span class="text-slate-highlight">{{ fmtNum(bet) }} BC</span> returned</p>
-            <p class="breakeven-detail-msg">No loss, no gain. Spin again!</p>
+            <p class="breakeven-detail-msg">Close one! Your bet is back.</p>
           </div>
           <button class="btn-breakeven-confirm" @click="confirmBreakEven">OK</button>
         </div>

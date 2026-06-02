@@ -1377,6 +1377,13 @@ ul {
   margin: 0;
 }
 
+.win-detail-msg {
+  font-size: 22px;
+  font-weight: 700;
+  color: #9ca3af;
+  margin: 0;
+}
+
 .text-gold-highlight {
   color: #ffd700;
   text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);

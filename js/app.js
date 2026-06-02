@@ -555,7 +555,7 @@ new Vue({
       if (!isFree) {
         if (this.sessionBudget < this.bet) {
           this.autoActive = false; // 예산 부족 시 오토스핀 종료
-          this.alertMessage = "Insufficient Session Budget! Please deposit funds first.";
+          this.alertMessage = "Not enough budget. Please deposit to continue.";
           this.showAlert = true;
           return;
         }
@@ -702,6 +702,13 @@ new Vue({
         }
       }
       this._spinLock = false;
+    },
+
+    getWinMsgText(tier) {
+      if (tier === 'mega') return "You're a Legend. The Crown is yours!";
+      if (tier === 'jackpot') return "Fortune favors the fearless!";
+      if (tier === 'big') return "Big smiles, bigger rewards!";
+      return "Nice shot! Keep it going!";
     },
 
     confirmWin() {
