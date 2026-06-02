@@ -98,6 +98,7 @@ const BET_OPTIONS = [10, 50, 100, 300, 500, 1000];
 const INITIAL_BALANCE = 60000;
 const LOSE_AUTO_DELAY = 1200;
 const BREAK_AUTO_DELAY = 1200;
+const RESPIN_DELAY = 1500;
 
 const CHARACTERS = [
   { id: 'teddy',   name: 'Teddy'   },
@@ -694,7 +695,7 @@ new Vue({
         this._respinTimeout = setTimeout(() => {
           this.showRespinOverlay = false;
           this.doSpin(true);
-        }, 1500);
+        }, RESPIN_DELAY);
       } else {
         this.showLose = true;
         if (this.autoActive) {
@@ -764,7 +765,7 @@ new Vue({
       this._respinTimeout = setTimeout(() => {
         this.showRespinOverlay = false;
         this.doSpin(true);
-      }, 1000);
+      }, RESPIN_DELAY);
     },
 
     triggerCoinRain() {

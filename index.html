@@ -472,7 +472,7 @@
     <transition name="fade">
       <div v-if="showBreakEven" class="breakeven-overlay" @click.self="confirmBreakEven">
         <div class="breakeven-box-popup">
-          <div class="breakeven-title">BREAK EVEN.</div>
+          <div class="breakeven-title">BREAK EVEN</div>
           <div class="breakeven-details">
             <p class="breakeven-detail-bet">Your bet <span class="text-slate-highlight">{{ fmtNum(bet) }} BC</span> returned</p>
             <p class="breakeven-detail-msg">Close one! Your bet is back.</p>
@@ -510,6 +510,7 @@
           <button class="btn-close-x" @click="showAlert = false">×</button>
           <h2 class="popup-title text-red-500">Notice</h2>
           <div class="alert-msg">{{ alertMessage }}</div>
+          <button class="btn-alert-confirm" @click="showAlert = false">OK</button>
         </div>
       </div>
     </transition>

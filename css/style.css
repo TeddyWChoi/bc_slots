@@ -2022,6 +2022,29 @@ ul {
   margin-top: 16px;
 }
 
+.btn-alert-confirm {
+  margin-top: 24px;
+  width: 140px;
+  height: 36px;
+  background: linear-gradient(180deg, #dc2626 0%, #7f1d1d 100%);
+  border: 1px solid #fca5a5;
+  border-radius: 18px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.btn-alert-confirm:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.btn-alert-confirm:active {
+  transform: translateY(0);
+}
+
 .btn-close-x {
   position: absolute;
   top: 12px;
