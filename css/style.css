@@ -646,13 +646,19 @@ ul {
 /* ===== PAYTABLE FANCY (left panel) ===== */
 .paytable-fancy {
   width: 100%;
-  background: linear-gradient(160deg, rgba(20, 4, 4, 0.97) 0%, rgba(40, 10, 5, 0.95) 100%);
-  border: 1px solid rgba(212, 175, 55, 0.45);
-  border-radius: 14px;
-  padding: 10.4px 11.2px 8px;
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.08), inset 0 0 30px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, rgba(24, 6, 6, 0.98) 0%, rgba(35, 12, 22, 0.97) 50%, rgba(12, 4, 15, 0.98) 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  border-radius: 16px;
+  padding: 12px 12px 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 25px rgba(212, 175, 55, 0.12), inset 0 0 20px rgba(255, 215, 0, 0.05);
   position: relative;
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.paytable-fancy:hover {
+  border-color: rgba(212, 175, 55, 0.8);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 35px rgba(212, 175, 55, 0.2), inset 0 0 25px rgba(255, 215, 0, 0.08);
 }
 
 .paytable-fancy::before {
@@ -661,42 +667,57 @@ ul {
   top: 0;
   left: 0;
   right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #ffd700 40%, #dc2626 60%, transparent);
+  height: 3px;
+  background: linear-gradient(90deg, #ffd700, #ff4500, #9400d3, #ffd700);
+  background-size: 300% 100%;
+  animation: pfHeaderGlow 4s linear infinite;
+}
+
+@keyframes pfHeaderGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .paytable-fancy-header {
   display: flex;
   align-items: center;
-  gap: 6.4px;
-  margin-bottom: 8.8px;
+  gap: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  padding-bottom: 8px;
 }
 
 .pf-icon {
-  font-size: 13px;
+  font-size: 14px;
+  animation: thunderGlow 1.5s infinite alternate;
+}
+
+@keyframes thunderGlow {
+  0% { transform: scale(1); filter: drop-shadow(0 0 2px #ffd700); }
+  100% { transform: scale(1.15); filter: drop-shadow(0 0 8px #ffd700) drop-shadow(0 0 15px #ff4500); }
 }
 
 .pf-title {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
-  letter-spacing: 2.5px;
-  color: #ffd700;
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, #ffffff 10%, #ffd700 60%, #ffa500 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
   flex: 1;
 }
 
 .pf-sub {
-  font-size: 8px;
-  color: rgba(212, 175, 55, 0.5);
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  display: none;
 }
 
 .paytable-fancy-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
-  margin-bottom: 7.2px;
+  gap: 6px;
+  margin-bottom: 10px;
 }
 
 .pf-card {
@@ -705,167 +726,267 @@ ul {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 6px 4px 5px;
-  border-radius: 9px;
+  gap: 4px;
+  padding: 8px 4px 6px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(0, 0, 0, 0.35);
-  transition: transform 0.2s;
+  background: rgba(10, 5, 15, 0.6);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: default;
   overflow: hidden;
 }
 
+/* 카드 광택(Shine) 효과 가상요소 */
+.pf-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 30%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.13);
+  transform: rotate(30deg);
+  transition: none;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.pf-card:hover::after {
+  opacity: 1;
+  left: 130%;
+  transition: all 0.6s ease-in-out;
+}
+
 .pf-card:hover {
-  transform: scale(1.04);
+  transform: translateY(-2px) scale(1.05);
+  background: rgba(20, 10, 25, 0.75);
 }
 
 /* tier styles */
 .pf-tier-mega {
-  border-color: rgba(255, 215, 0, 0.6);
-  background: linear-gradient(160deg, rgba(60, 40, 0, 0.7), rgba(20, 10, 0, 0.7));
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.25), inset 0 0 8px rgba(255, 215, 0, 0.08);
+  border-color: rgba(255, 215, 0, 0.7);
+  background: linear-gradient(135deg, rgba(80, 50, 0, 0.9), rgba(35, 15, 0, 0.95));
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.25), inset 0 0 12px rgba(255, 215, 0, 0.15);
   grid-column: span 2;
+}
+.pf-tier-mega:hover {
+  border-color: #ffd700;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6), inset 0 0 15px rgba(255, 215, 0, 0.3);
 }
 
 .pf-tier-jackpot {
-  border-color: rgba(239, 68, 68, 0.6);
-  background: linear-gradient(160deg, rgba(50, 5, 5, 0.7), rgba(20, 3, 3, 0.7));
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
+  border-color: rgba(248, 113, 113, 0.7);
+  background: linear-gradient(135deg, rgba(70, 10, 10, 0.9), rgba(35, 5, 5, 0.95));
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.25), inset 0 0 12px rgba(239, 68, 68, 0.15);
   grid-column: span 2;
+}
+.pf-tier-jackpot:hover {
+  border-color: #f87171;
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.55), inset 0 0 15px rgba(239, 68, 68, 0.3);
 }
 
 .pf-tier-big {
-  border-color: rgba(251, 191, 36, 0.4);
-  background: rgba(30, 15, 0, 0.5);
+  border-color: rgba(251, 191, 36, 0.55);
+  background: linear-gradient(135deg, rgba(50, 30, 0, 0.8), rgba(25, 12, 0, 0.9));
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.15), inset 0 0 8px rgba(251, 191, 36, 0.08);
+}
+.pf-tier-big:hover {
+  border-color: #fbbf24;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.45), inset 0 0 10px rgba(251, 191, 36, 0.2);
 }
 
 .pf-tier-med {
-  border-color: rgba(34, 197, 94, 0.3);
-  background: rgba(5, 20, 5, 0.5);
+  border-color: rgba(34, 197, 94, 0.45);
+  background: linear-gradient(135deg, rgba(10, 40, 15, 0.8), rgba(5, 20, 5, 0.9));
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.15);
+}
+.pf-tier-med:hover {
+  border-color: #4ade80;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.4), inset 0 0 10px rgba(34, 197, 94, 0.15);
 }
 
 .pf-tier-sm {
-  border-color: rgba(148, 163, 184, 0.25);
-  background: rgba(15, 15, 20, 0.5);
+  border-color: rgba(148, 163, 184, 0.4);
+  background: linear-gradient(135deg, rgba(25, 30, 45, 0.8), rgba(12, 15, 22, 0.9));
+  box-shadow: 0 0 10px rgba(148, 163, 184, 0.1);
+}
+.pf-tier-sm:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 0 16px rgba(148, 163, 184, 0.35);
 }
 
 .pf-glow-ring {
   position: absolute;
   inset: -1px;
-  border-radius: 9px;
+  border-radius: 10px;
   pointer-events: none;
 }
 
 .pf-tier-mega .pf-glow-ring {
-  box-shadow: inset 0 0 12px rgba(255, 215, 0, 0.15);
-  animation: pfPulse 2.4s ease-in-out infinite;
-}
-
-.pf-tier-jackpot .pf-glow-ring {
-  box-shadow: inset 0 0 12px rgba(239, 68, 68, 0.15);
+  box-shadow: inset 0 0 15px rgba(255, 215, 0, 0.3);
   animation: pfPulse 2s ease-in-out infinite;
 }
 
+.pf-tier-jackpot .pf-glow-ring {
+  box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.3);
+  animation: pfPulse 1.6s ease-in-out infinite;
+}
+
 @keyframes pfPulse {
-
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-
-  50% {
-    opacity: 1;
-  }
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.95; }
 }
 
 .pf-sym-img {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   object-fit: contain;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.8));
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pf-card:hover .pf-sym-img {
+  transform: scale(1.15) rotate(5deg);
 }
 
 .pf-tier-mega .pf-sym-img {
-  width: 44px;
-  height: 44px;
-  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+  width: 48px;
+  height: 48px;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.75));
 }
 
 .pf-tier-jackpot .pf-sym-img {
-  width: 44px;
-  height: 44px;
-  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
+  width: 48px;
+  height: 48px;
+  filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.65));
 }
 
 .pf-sym-mult {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
   letter-spacing: 0.5px;
   line-height: 1;
 }
 
 .pf-tier-mega .pf-sym-mult {
-  font-size: 15px;
+  font-size: 16px;
   color: #ffd700;
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.85), 0 2px 2px rgba(0,0,0,0.8);
 }
 
 .pf-tier-jackpot .pf-sym-mult {
-  font-size: 15px;
+  font-size: 16px;
   color: #f87171;
-  text-shadow: 0 0 6px rgba(248, 113, 113, 0.6);
+  text-shadow: 0 0 8px rgba(248, 113, 113, 0.85), 0 2px 2px rgba(0,0,0,0.8);
 }
 
 .pf-tier-big .pf-sym-mult {
   color: #fbbf24;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 }
 
 .pf-tier-med .pf-sym-mult {
   color: #4ade80;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 }
 
 .pf-tier-sm .pf-sym-mult {
   color: #94a3b8;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 }
 
 .pf-sym-name {
-  font-size: 7px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
-  opacity: 0.6;
-  color: #fff;
+  opacity: 0.7;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .pf-tier-mega .pf-sym-name {
   color: #ffd700;
-  opacity: 0.8;
+  opacity: 1;
 }
 
 .pf-tier-jackpot .pf-sym-name {
   color: #f87171;
-  opacity: 0.8;
+  opacity: 1;
+}
+
+/* Bonus descriptions redesigned */
+.pf-bonus-group {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(212, 175, 55, 0.25);
 }
 
 .pf-bonus-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 4px 0 0;
-  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  justify-content: space-around;
+  background: rgba(15, 5, 10, 0.6);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
+  padding: 4.5px 6px;
+  transition: all 0.25s ease;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.pf-bonus-row:hover {
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.45);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.15), inset 0 0 10px rgba(0, 0, 0, 0.2);
+  transform: scale(1.01);
+}
+
+.pf-bonus-row.border-slate {
+  border-color: rgba(148, 163, 184, 0.3);
+  background: rgba(148, 163, 184, 0.05);
+}
+.pf-bonus-row.border-slate:hover {
+  border-color: rgba(148, 163, 184, 0.6);
+  background: rgba(148, 163, 184, 0.12);
+  box-shadow: 0 0 10px rgba(148, 163, 184, 0.15);
+}
+
+.pf-bonus-row.border-gold {
+  border-color: rgba(255, 215, 0, 0.3);
+  background: rgba(255, 215, 0, 0.05);
+}
+.pf-bonus-row.border-gold:hover {
+  border-color: rgba(255, 215, 0, 0.6);
+  background: rgba(255, 215, 0, 0.12);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+}
+
+.pf-bonus-row.border-purple {
+  border-color: rgba(168, 85, 247, 0.35);
+  background: rgba(168, 85, 247, 0.06);
+}
+.pf-bonus-row.border-purple:hover {
+  border-color: rgba(168, 85, 247, 0.65);
+  background: rgba(168, 85, 247, 0.15);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
 }
 
 .pf-bonus-item {
-  font-size: 9px;
-  color: rgba(212, 175, 55, 0.7);
-  font-weight: 700;
-  letter-spacing: 0.3px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: rgba(212, 175, 55, 0.95);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .pf-bonus-divider {
-  color: rgba(212, 175, 55, 0.3);
   font-size: 10px;
+  color: rgba(255, 255, 255, 0.2);
 }
 
 
