@@ -297,14 +297,7 @@ ul {
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
 }
 
-.box-dark-sm {
-  width: 100%;
-  border-radius: 12px;
-  overflow: hidden;
-  background: rgba(26, 5, 5, 0.92);
-  border: 1px solid rgba(212, 175, 55, 0.25);
-  display: none;
-}
+
 
 .panel-section {
   padding: 20px 20px 16px;
@@ -323,133 +316,7 @@ ul {
   letter-spacing: 3.2px;
 }
 
-.balance-val {
-  font-size: 20px;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: 0.8px;
-}
 
-.balance-unit {
-  font-size: 11px;
-  color: #ae905e;
-  font-weight: 700;
-  margin-top: 2px;
-}
-
-/* Bet controls */
-.bet-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.btn-bet-adj {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 18px;
-  background: rgba(174, 144, 94, 0.2);
-  border: 1px solid rgba(174, 144, 94, 0.4);
-  color: #ae905e;
-  transition: transform 0.1s;
-}
-
-.btn-bet-adj:active:not(:disabled) {
-  transform: scale(0.9);
-}
-
-.bet-display {
-  flex: 1;
-  text-align: center;
-  border-radius: 8px;
-  padding: 8px 4px;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-}
-
-.bet-display-val {
-  font-size: 14px;
-  font-weight: 900;
-  color: #fff;
-}
-
-.bet-display-unit {
-  font-size: 9px;
-  color: #ae905e;
-}
-
-.btn-maxbet {
-  width: 100%;
-  margin-top: 12px;
-  padding: 8px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  background: linear-gradient(135deg, #dc2626, #7f1d1d);
-  border: 1px solid rgba(248, 113, 113, 0.4);
-  color: #fee2e2;
-  transition: opacity 0.2s;
-}
-
-/* Quick Bet */
-.quick-bet-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.btn-quick-bet {
-  padding: 6px;
-  border-radius: 8px;
-  font-size: 9px;
-  font-weight: 700;
-  transition: all 0.2s;
-}
-
-.btn-quick-bet:active {
-  transform: scale(0.92);
-}
-
-/* Paytable summary */
-.paytable-header {
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-  text-align: center;
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #ae905e;
-}
-
-.paytable-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 10px;
-  padding: 4px 0;
-}
-
-.paytable-sym {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.paytable-sym img {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-}
 
 /* ===== CENTER PANEL ===== */
 .center-panel {
@@ -605,44 +472,7 @@ ul {
   align-items: center;
 }
 
-/* Total Win box */
-.total-win-box {
-  position: absolute;
-  left: 0;
-  top: 44%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 16px;
-  width: 190px;
-  height: 76px;
-  padding: 0 16px;
-  background: rgba(0, 0, 0, 0.85);
-  border: 2px solid rgba(174, 144, 94, 0.6);
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 16px rgba(174, 144, 94, 0.2);
-}
 
-.total-win-label {
-  font-size: 9px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #ae905e;
-  margin-bottom: 4px;
-}
-
-.total-win-val {
-  font-weight: 900;
-  letter-spacing: 3.2px;
-  color: #fff;
-  font-size: 18px;
-}
-
-.total-win-unit {
-  font-size: 9px;
-  color: #ae905e;
-}
 
 /* ===== TOTAL WIN MINI (left panel top) ===== */
 /* ===== PAYTABLE FANCY (left panel) ===== */
@@ -726,9 +556,7 @@ ul {
   flex: 1;
 }
 
-.pf-sub {
-  display: none;
-}
+
 
 .paytable-fancy-grid {
   display: grid;
@@ -920,29 +748,7 @@ ul {
   }
 }
 
-.pf-sym-img {
-  width: 38px;
-  height: 38px;
-  object-fit: contain;
-  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.8));
-  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
 
-.pf-card:hover .pf-sym-img {
-  transform: scale(1.15) rotate(5deg);
-}
-
-.pf-tier-mega .pf-sym-img {
-  width: 48px;
-  height: 48px;
-  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.75));
-}
-
-.pf-tier-jackpot .pf-sym-img {
-  width: 48px;
-  height: 48px;
-  filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.65));
-}
 
 .pf-sym-mult {
   font-size: 13px;
@@ -1165,102 +971,7 @@ ul {
   margin-left: auto;
 }
 
-.user-bet-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-}
 
-.user-bet-input-wrap {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  background: rgba(20, 4, 4, 0.9);
-  border: 1px solid rgba(212, 175, 55, 0.4);
-  border-radius: 8px;
-  padding: 5.6px 9.6px;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
-  box-sizing: border-box;
-  gap: 5px;
-}
-
-.user-bet-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  width: 100%;
-  min-width: 0;
-}
-
-.user-bet-input:disabled {
-  opacity: 0.5;
-}
-
-/* Remove number spinners */
-.user-bet-input::-webkit-outer-spin-button,
-.user-bet-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.user-bet-input[type=number] {
-  -moz-appearance: textfield;
-}
-
-.btn-max-bet {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, #e05555, #8b1a1a);
-  border: 2px solid rgba(255, 200, 100, 0.4);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 900;
-  cursor: pointer;
-  flex-shrink: 0;
-  line-height: 1.2;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  transition: transform 0.1s, box-shadow 0.1s;
-  letter-spacing: 0.5px;
-}
-
-.btn-max-bet:hover:not(:disabled) {
-  transform: scale(1.06);
-  box-shadow: 0 6px 18px rgba(185, 28, 28, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-.btn-max-bet:active:not(:disabled) {
-  transform: scale(0.95);
-}
-
-.btn-max-bet:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.btn-max-sub {
-  font-size: 8px;
-  font-weight: 700;
-  color: rgba(255, 220, 120, 0.9);
-  letter-spacing: 0.3px;
-}
-
-.bet-hint {
-  font-size: 10px;
-  color: rgba(212, 175, 55, 0.5);
-  margin-top: 5.6px;
-  text-align: center;
-  letter-spacing: 0.5px;
-}
 
 
 
@@ -1441,27 +1152,7 @@ ul {
   background: rgba(255, 255, 255, 0.05);
 }
 
-.popup-row-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
 
-.popup-row-left img {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
-}
-
-.popup-row-name {
-  color: #fff;
-  font-weight: 700;
-}
-
-.popup-row-multi {
-  color: #ffd700;
-  font-weight: 900;
-}
 
 .popup-close {
   width: 100%;
@@ -2772,25 +2463,7 @@ ul {
   margin-bottom: 4px;
 }
 
-.locked-overlay-btn {
-  background: linear-gradient(135deg, #eab308, #ca8a04);
-  color: #1c0d02;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  padding: 8px 20px;
-  border-radius: 9999px;
-  border: 1px solid rgba(254, 240, 138, 0.4);
-  box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
 
-.locked-overlay-btn:hover {
-  background: linear-gradient(135deg, #facc15, #eab308);
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(234, 179, 8, 0.6);
-}
 
 /* Sidebar mini lock */
 .locked-overlay-mini {

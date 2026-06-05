@@ -2,13 +2,13 @@
 // 심볼 & 배당 데이터
 // ============================================================================
 const SYMBOLS = [
-  { id: 'pistol',  emoji: '🔫', name: 'Pistol',  weight: 35, color: '#94a3b8', glow: 'rgba(148,163,184,0.6)', imgUrl: 'assets/symbol4.png' },
-  { id: 'grenade', emoji: '💣', name: 'Grenade', weight: 28, color: '#f59e0b', glow: 'rgba(245,158,11,0.6)',  imgUrl: 'assets/symbol2.png' },
-  { id: 'knife',   emoji: '🔪', name: 'Knife',   weight: 18, color: '#ef4444', glow: 'rgba(239,68,68,0.6)',   imgUrl: 'assets/symbol5.png' },
-  { id: 'helmet',  emoji: '🪖', name: 'Helmet',  weight: 10, color: '#22c55e', glow: 'rgba(34,197,94,0.6)',   imgUrl: 'assets/symbol6.png' },
-  { id: 'smile',   emoji: '😊', name: 'Smile',   weight: 5,  color: '#fbbf24', glow: 'rgba(251,191,36,0.8)',  imgUrl: 'assets/symbol7.png' },
-  { id: 'skull',   emoji: '💀', name: 'Skull',   weight: 3,  color: '#f87171', glow: 'rgba(248,113,113,0.9)', imgUrl: 'assets/symbol3.png' },
-  { id: 'crown',   emoji: '👑', name: 'Crown',   weight: 1,  color: '#ffd700', glow: 'rgba(255,215,0,1)',     imgUrl: 'assets/symbol1.png' },
+  { id: 'pistol',  emoji: '🔫', name: 'Pistol',  weight: 35, color: '#94a3b8', glow: 'rgba(148,163,184,0.6)', imgUrl: 'assets/symbol4.webp' },
+  { id: 'grenade', emoji: '💣', name: 'Grenade', weight: 28, color: '#f59e0b', glow: 'rgba(245,158,11,0.6)',  imgUrl: 'assets/symbol2.webp' },
+  { id: 'knife',   emoji: '🔪', name: 'Knife',   weight: 18, color: '#ef4444', glow: 'rgba(239,68,68,0.6)',   imgUrl: 'assets/symbol5.webp' },
+  { id: 'helmet',  emoji: '🪖', name: 'Helmet',  weight: 10, color: '#22c55e', glow: 'rgba(34,197,94,0.6)',   imgUrl: 'assets/symbol6.webp' },
+  { id: 'smile',   emoji: '😊', name: 'Smile',   weight: 5,  color: '#fbbf24', glow: 'rgba(251,191,36,0.8)',  imgUrl: 'assets/symbol7.webp' },
+  { id: 'skull',   emoji: '💀', name: 'Skull',   weight: 3,  color: '#f87171', glow: 'rgba(248,113,113,0.9)', imgUrl: 'assets/symbol3.webp' },
+  { id: 'crown',   emoji: '👑', name: 'Crown',   weight: 1,  color: '#ffd700', glow: 'rgba(255,215,0,1)',     imgUrl: 'assets/symbol1.webp' },
   { id: 'mystery', emoji: '❓', name: 'Respin',  weight: 6,  color: '#a855f7', glow: 'rgba(168,85,247,0.7)', imgUrl: '' },
 ];
 
@@ -108,20 +108,12 @@ const CHARACTERS = [
   { id: 'assault', name: 'Assault' },
 ];
 
-const TOTAL_WEIGHT = SYMBOLS.reduce((a, s) => a + s.weight, 0);
 const STRIP_SIZE = 60;
 const REEL_SPEED = 1600; // px/sec
 
 // ============================================================================
 // 유틸리티
 // ============================================================================
-function getWeightedRandom(excludeMystery = false) {
-  const list = excludeMystery ? SYMBOLS.filter(s => s.id !== 'mystery') : SYMBOLS;
-  const totalWeight = list.reduce((a, s) => a + s.weight, 0);
-  let r = Math.random() * totalWeight;
-  for (const s of list) { r -= s.weight; if (r <= 0) return s; }
-  return list[0];
-}
 
 function makeStrip(isLast = false) {
   const list = isLast ? SYMBOLS : SYMBOLS.filter(s => s.id !== 'mystery');
@@ -194,7 +186,8 @@ function buildReelsFromOutcome(outcome) {
     // ❓ 는 세 번째 릴에만 등장
     const mystery = symOf('mystery');
     const s0 = rand(nonMystery);
-    const s1 = rand(nonMystery);
+    const others = nonMystery.filter(x => x.id !== s0.id);
+    const s1 = rand(others);
     return [s0, s1, mystery];
   }
   // miss: 랜덤이지만 3매치/2매치/break 가 안 되도록 조합
@@ -332,13 +325,11 @@ new Vue({
       // ── 공개 데이터 (템플릿에서 참조) ──
       SYMBOLS,
       THREE_OF_A_KIND,
-      BET_OPTIONS,
       CHARACTERS,
 
       isLoggedIn:   false,
       balance:      INITIAL_BALANCE,
       selectedChar: '',
-      betIndex:     2,
       betAmount:    100,
       betInput:     '100',
       spinning: false,
@@ -351,7 +342,7 @@ new Vue({
       gameMode: 'normal', // 'normal' | 'test'
       displayWin: 0,
       lastWinAmt: 0,
-      currentCharacter: 'assets/character.png',
+      currentCharacter: 'assets/character.webp',
       showCoinRain: false,
       coins: [],
       showRespinOverlay: false,
@@ -363,7 +354,6 @@ new Vue({
 
       history: [],
       showHistory: false,
-      showPayTable: false,
 
       // 릴 상태 (translateY가 Vue reactive로 관리됨)
       reels: [makeReel(false), makeReel(false), makeReel(true)],
@@ -402,9 +392,9 @@ new Vue({
   watch: {
     showWin(newVal) {
       if (newVal) {
-        this.currentCharacter = 'assets/character2.png';
+        this.currentCharacter = 'assets/character2.webp';
       } else {
-        this.currentCharacter = 'assets/character.png';
+        this.currentCharacter = 'assets/character.webp';
         if (this._winHideTimeout) {
           clearTimeout(this._winHideTimeout);
           this._winHideTimeout = null;
@@ -501,12 +491,6 @@ new Vue({
       this.betInput  = String(MAX_BET);
       sound.playClick();
     },
-    handleMinBet() {
-      if (this.spinning) return;
-      this.betAmount = MIN_BET;
-      this.betInput  = String(MIN_BET);
-      sound.playClick();
-    },
     // ── 세션 예산 관리 ──
     depositBudget() {
       if (this.spinning) return;
@@ -579,6 +563,10 @@ new Vue({
       clearTimeout(this._loseHideTimeout);
       clearTimeout(this._autoSpinTimeout);
       clearTimeout(this._respinTimeout);
+      if (this._countupRaf) {
+        cancelAnimationFrame(this._countupRaf);
+        this._countupRaf = null;
+      }
 
       this.spinning = true;
       this.handleReturning = false;
@@ -734,6 +722,10 @@ new Vue({
       this.showWin = false;
       this.showCoinRain = false;
       this.coins = [];
+      if (this._countupRaf) {
+        cancelAnimationFrame(this._countupRaf);
+        this._countupRaf = null;
+      }
       if (this.hasPendingRespin) {
         this.hasPendingRespin = false;
         this.triggerFreeRespinNow();
@@ -883,54 +875,19 @@ new Vue({
         filter: won ? `drop-shadow(0 0 14px ${sym.glow})` : 'drop-shadow(0 4px 6px rgba(0,0,0,0.5))',
       };
     },
-
-    autoOptStyle(val) {
-      const sel = this.autoSpinCount === val;
-      return {
-        background: sel ? 'linear-gradient(146deg,#b45309,#f59e0b)' : 'transparent',
-        border: sel ? '1px solid rgba(252,211,77,0.5)' : '1px solid transparent',
-        color: sel ? '#fff' : 'rgba(220,180,180,0.5)',
-      };
-    },
-    autoOffStyle() {
-      const sel = this.autoSpinCount === null;
-      return {
-        background: sel ? 'linear-gradient(146deg,#7f1d1d,#b91c1c)' : 'transparent',
-        border: sel ? '1px solid rgba(212,175,55,0.5)' : '1px solid transparent',
-        color: sel ? '#fff' : 'rgba(220,180,180,0.5)',
-      };
-    },
-    quickBetStyle(i) {
-      const sel = this.betIndex === i;
-      return {
-        background: sel ? 'linear-gradient(135deg,#92400e,#d97706)' : 'rgba(0,0,0,0.4)',
-        border: sel ? '1px solid rgba(252,211,77,0.5)' : '1px solid rgba(100,80,40,0.3)',
-        color: sel ? '#fff' : 'rgba(180,160,100,0.7)',
-      };
-    },
-     fmtBet(b) { return b >= 1000 ? (b / 1000) + 'K' : b; },
     fmtNum(n) { return n.toLocaleString(); },
-    paytableRows() {
-      return [
-        { id: 'crown', label: 'Crown ×3', multi: '×1000', color: '#ffd700' },
-        { id: 'skull', label: 'Skull ×3', multi: '×100', color: '#f87171' },
-        { id: 'smile', label: 'Smile ×3', multi: '×50', color: '#fbbf24' },
-        { id: 'helmet', label: 'Helmet ×3', multi: '×25', color: '#22c55e' },
-        { id: 'knife', label: 'Knife ×3', multi: '×15', color: '#ef4444' },
-      ];
-    },
     toggleLogin() {
       if (this.isLoggedIn) {
         // Sign Out
         this.isLoggedIn = false;
         this.selectedChar = '';
-        this.currentCharacter = 'assets/character.png';
+        this.currentCharacter = 'assets/character.webp';
         this.autoActive = false; // Turn off auto spin if active
       } else {
         // Sign In
         this.isLoggedIn = true;
         this.selectedChar = 'teddy';
-        this.currentCharacter = 'assets/character.png';
+        this.currentCharacter = 'assets/character.webp';
       }
       sound.playClick();
     },

@@ -9,42 +9,7 @@
   <link rel="stylesheet" href="css/style.css?v=27">
   <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-  <style>
-    .spin-auto-panel {
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      background: rgba(26, 4, 4, 0.98) !important;
-      border: 2px solid rgba(212, 175, 55, 0.7) !important;
-      border-radius: 50% !important;
-      width: 92px !important;
-      height: 92px !important;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(0, 0, 0, 0.8) !important;
-      pointer-events: none !important;
-      position: absolute !important;
-      left: 50% !important;
-      top: 50% !important;
-      transform: translate(-50%, -50%) !important;
-      z-index: 999 !important;
-    }
-
-    .spin-autospin-left {
-      font-weight: 900 !important;
-      font-size: 32px !important;
-      color: #ffd700 !important;
-      line-height: 1.1 !important;
-      text-shadow: 0 0 6px rgba(255, 215, 0, 0.4) !important;
-    }
-
-    .spin-autospin-label {
-      font-weight: 700 !important;
-      font-size: 9px !important;
-      color: rgba(255, 255, 255, 0.6) !important;
-      letter-spacing: 1px !important;
-      margin-top: 2px !important;
-    }
-  </style>
+  
 </head>
 
 <body>
@@ -52,16 +17,16 @@
 
     <!-- ── 배경 이미지 ── -->
     <div class="bg-layer">
-      <img src="assets/bg.png" alt="" onerror="this.style.display='none'">
+      <img src="assets/bg.webp" alt="" onerror="this.style.display='none'">
       <div class="bg-overlay"></div>
     </div>
 
     <header class="app-header" :class="{ 'test-mode-active': gameMode === 'test' }">
       <div class="header-logo">
-        <img src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">
+        <img src="assets/logo.webp" alt="Logo" onerror="this.style.display='none'">
       </div>
       <div class="header-title">
-        <img src="assets/title.png" alt="BlackShot Slots" onerror="this.style.display='none'">
+        <img src="assets/title.webp" alt="BlackShot Slots" onerror="this.style.display='none'">
       </div>
       <div class="header-actions">
         <button :class="isLoggedIn ? 'btn-signout' : 'btn-signin'" @click="toggleLogin">
@@ -131,9 +96,9 @@
             <div class="pf-card pf-tier-mega">
               <div class="pf-glow-ring"></div>
               <div class="pf-sym-combo-wrap">
-                <img src="assets/symbol1.png" class="pf-sym-img-sm" alt="Crown">
-                <img src="assets/symbol1.png" class="pf-sym-img-sm" alt="Crown">
-                <img src="assets/symbol1.png" class="pf-sym-img-sm" alt="Crown">
+                <img src="assets/symbol1.webp" class="pf-sym-img-sm" alt="Crown">
+                <img src="assets/symbol1.webp" class="pf-sym-img-sm" alt="Crown">
+                <img src="assets/symbol1.webp" class="pf-sym-img-sm" alt="Crown">
               </div>
               <div class="pf-sym-mult">×1000</div>
               <div class="pf-sym-name">MEGA</div>
@@ -141,9 +106,9 @@
             <!-- SPECIAL COMBO 1 (x200) -->
             <div class="pf-card pf-tier-special span-2">
               <div class="pf-sym-combo-wrap">
-                <img src="assets/symbol1.png" class="pf-sym-img-sm" alt="Crown">
-                <img src="assets/symbol3.png" class="pf-sym-img-sm" alt="Skull">
-                <img src="assets/symbol1.png" class="pf-sym-img-sm" alt="Crown">
+                <img src="assets/symbol1.webp" class="pf-sym-img-sm" alt="Crown">
+                <img src="assets/symbol3.webp" class="pf-sym-img-sm" alt="Skull">
+                <img src="assets/symbol1.webp" class="pf-sym-img-sm" alt="Crown">
               </div>
               <div class="pf-sym-mult text-gold">×200</div>
               <div class="pf-sym-name">SPECIAL COMBO</div>
@@ -152,9 +117,9 @@
             <div class="pf-card pf-tier-jackpot">
               <div class="pf-glow-ring"></div>
               <div class="pf-sym-combo-wrap">
-                <img src="assets/symbol3.png" class="pf-sym-img-sm" alt="Skull">
-                <img src="assets/symbol3.png" class="pf-sym-img-sm" alt="Skull">
-                <img src="assets/symbol3.png" class="pf-sym-img-sm" alt="Skull">
+                <img src="assets/symbol3.webp" class="pf-sym-img-sm" alt="Skull">
+                <img src="assets/symbol3.webp" class="pf-sym-img-sm" alt="Skull">
+                <img src="assets/symbol3.webp" class="pf-sym-img-sm" alt="Skull">
               </div>
               <div class="pf-sym-mult">×100</div>
               <div class="pf-sym-name">JACKPOT</div>
@@ -162,9 +127,9 @@
             <!-- SPECIAL COMBO 2 (x50) -->
             <div class="pf-card pf-tier-special span-1">
               <div class="pf-sym-combo-wrap">
-                <img src="assets/symbol3.png" class="pf-sym-img-sm" alt="Skull">
-                <img src="assets/symbol7.png" class="pf-sym-img-sm" alt="Smile">
-                <img src="assets/symbol3.png" class="pf-sym-img-sm" alt="Skull">
+                <img src="assets/symbol3.webp" class="pf-sym-img-sm" alt="Skull">
+                <img src="assets/symbol7.webp" class="pf-sym-img-sm" alt="Smile">
+                <img src="assets/symbol3.webp" class="pf-sym-img-sm" alt="Skull">
               </div>
               <div class="pf-sym-mult text-gold" style="font-size: 14px; margin-top: 1px;">×50</div>
               <div class="pf-sym-name" style="font-size: 7px;">SPECIAL COMBO</div>
@@ -172,9 +137,9 @@
             <!-- BIG -->
             <div class="pf-card pf-tier-big">
               <div class="pf-sym-combo-wrap">
-                <img src="assets/symbol7.png" class="pf-sym-img-sm" alt="Smile">
-                <img src="assets/symbol7.png" class="pf-sym-img-sm" alt="Smile">
-                <img src="assets/symbol7.png" class="pf-sym-img-sm" alt="Smile">
+                <img src="assets/symbol7.webp" class="pf-sym-img-sm" alt="Smile">
+                <img src="assets/symbol7.webp" class="pf-sym-img-sm" alt="Smile">
+                <img src="assets/symbol7.webp" class="pf-sym-img-sm" alt="Smile">
               </div>
               <div class="pf-sym-mult">×50</div>
               <div class="pf-sym-name">BIG WIN</div>
@@ -182,9 +147,9 @@
             <!-- MEDIUM 1 -->
             <div class="pf-card pf-tier-med">
               <div class="pf-sym-combo-wrap">
-                <img src="assets/symbol6.png" class="pf-sym-img-sm" alt="Helmet">
-                <img src="assets/symbol6.png" class="pf-sym-img-sm" alt="Helmet">
-                <img src="assets/symbol6.png" class="pf-sym-img-sm" alt="Helmet">
+                <img src="assets/symbol6.webp" class="pf-sym-img-sm" alt="Helmet">
+                <img src="assets/symbol6.webp" class="pf-sym-img-sm" alt="Helmet">
+                <img src="assets/symbol6.webp" class="pf-sym-img-sm" alt="Helmet">
               </div>
               <div class="pf-sym-mult">×25</div>
               <div class="pf-sym-name">MED</div>
@@ -192,9 +157,9 @@
             <!-- MEDIUM 2 -->
             <div class="pf-card pf-tier-med">
               <div class="pf-sym-combo-wrap">
-                <img src="assets/symbol5.png" class="pf-sym-img-sm" alt="Knife">
-                <img src="assets/symbol5.png" class="pf-sym-img-sm" alt="Knife">
-                <img src="assets/symbol5.png" class="pf-sym-img-sm" alt="Knife">
+                <img src="assets/symbol5.webp" class="pf-sym-img-sm" alt="Knife">
+                <img src="assets/symbol5.webp" class="pf-sym-img-sm" alt="Knife">
+                <img src="assets/symbol5.webp" class="pf-sym-img-sm" alt="Knife">
               </div>
               <div class="pf-sym-mult">×15</div>
               <div class="pf-sym-name">MED</div>
@@ -202,9 +167,9 @@
             <!-- SMALL 1 -->
             <div class="pf-card pf-tier-sm">
               <div class="pf-sym-combo-wrap">
-                <img src="assets/symbol2.png" class="pf-sym-img-sm" alt="Grenade">
-                <img src="assets/symbol2.png" class="pf-sym-img-sm" alt="Grenade">
-                <img src="assets/symbol2.png" class="pf-sym-img-sm" alt="Grenade">
+                <img src="assets/symbol2.webp" class="pf-sym-img-sm" alt="Grenade">
+                <img src="assets/symbol2.webp" class="pf-sym-img-sm" alt="Grenade">
+                <img src="assets/symbol2.webp" class="pf-sym-img-sm" alt="Grenade">
               </div>
               <div class="pf-sym-mult">×8</div>
               <div class="pf-sym-name">SMALL</div>
@@ -212,9 +177,9 @@
             <!-- SMALL 2 -->
             <div class="pf-card pf-tier-sm">
               <div class="pf-sym-combo-wrap">
-                <img src="assets/symbol4.png" class="pf-sym-img-sm" alt="Pistol">
-                <img src="assets/symbol4.png" class="pf-sym-img-sm" alt="Pistol">
-                <img src="assets/symbol4.png" class="pf-sym-img-sm" alt="Pistol">
+                <img src="assets/symbol4.webp" class="pf-sym-img-sm" alt="Pistol">
+                <img src="assets/symbol4.webp" class="pf-sym-img-sm" alt="Pistol">
+                <img src="assets/symbol4.webp" class="pf-sym-img-sm" alt="Pistol">
               </div>
               <div class="pf-sym-mult">×5</div>
               <div class="pf-sym-name">SMALL</div>
@@ -225,16 +190,16 @@
           <div class="pf-bonus-group">
             <!-- 2매치 당첨 -->
             <div class="pf-bonus-row">
-              <span class="pf-bonus-item" style="color: #ffd700;"><img src="assets/symbol1.png" class="pf-bonus-img" alt="Crown"><img src="assets/symbol1.png" class="pf-bonus-img" alt="Crown"> = ×10</span>
+              <span class="pf-bonus-item" style="color: #ffd700;"><img src="assets/symbol1.webp" class="pf-bonus-img" alt="Crown"><img src="assets/symbol1.webp" class="pf-bonus-img" alt="Crown"> = ×10</span>
               <span class="pf-bonus-divider">|</span>
-              <span class="pf-bonus-item" style="color: #f87171;"><img src="assets/symbol3.png" class="pf-bonus-img" alt="Skull"><img src="assets/symbol3.png" class="pf-bonus-img" alt="Skull"> = ×5</span>
+              <span class="pf-bonus-item" style="color: #f87171;"><img src="assets/symbol3.webp" class="pf-bonus-img" alt="Skull"><img src="assets/symbol3.webp" class="pf-bonus-img" alt="Skull"> = ×5</span>
               <span class="pf-bonus-divider">|</span>
-              <span class="pf-bonus-item" style="color: #fbbf24;"><img src="assets/symbol7.png" class="pf-bonus-img" alt="Smile"><img src="assets/symbol7.png" class="pf-bonus-img" alt="Smile"> = ×2</span>
+              <span class="pf-bonus-item" style="color: #fbbf24;"><img src="assets/symbol7.webp" class="pf-bonus-img" alt="Smile"><img src="assets/symbol7.webp" class="pf-bonus-img" alt="Smile"> = ×2</span>
             </div>
             <!-- 2매치 본전 (BREAK EVEN) -->
             <div class="pf-bonus-row border-slate">
               <span class="pf-bonus-item" style="color: #94a3b8;">
-                2 of <img src="assets/symbol6.png" class="pf-bonus-img" alt="Helmet"><img src="assets/symbol5.png" class="pf-bonus-img" alt="Knife"><img src="assets/symbol2.png" class="pf-bonus-img" alt="Grenade"><img src="assets/symbol4.png" class="pf-bonus-img" alt="Pistol"> = ×1 BREAK EVEN
+                2 of <img src="assets/symbol6.webp" class="pf-bonus-img" alt="Helmet"><img src="assets/symbol5.webp" class="pf-bonus-img" alt="Knife"><img src="assets/symbol2.webp" class="pf-bonus-img" alt="Grenade"><img src="assets/symbol4.webp" class="pf-bonus-img" alt="Pistol"> = ×1 BREAK EVEN
               </span>
             </div>
             <!-- 프리스핀 -->
@@ -281,17 +246,17 @@
       <main class="center-panel">
 
         <!-- 메가잭팟 배너 -->
-        <img src="assets/megabanner.png" alt="MEGA JACKPOT SLOTS" class="mega-banner"
+        <img src="assets/megabanner.webp" alt="MEGA JACKPOT SLOTS" class="mega-banner"
           onerror="this.style.display='none'">
 
         <!-- 슬롯 프레임 + 릴 -->
         <div class="slot-container">
-          <img src="assets/slotframe.png" alt="Slot Frame" class="slot-frame-img" onerror="this.style.opacity='0'">
+          <img src="assets/slotframe.webp" alt="Slot Frame" class="slot-frame-img" onerror="this.style.opacity='0'">
 
           <!-- 손잡이 (Handle) -->
           <div class="slot-handle-container" :class="{ spinning: spinning, returning: handleReturning, disabled: !isLoggedIn || spinning }" @click="handleHandleClick">
-            <img src="assets/handle.png" alt="Handle Up" class="handle-up">
-            <img src="assets/handle2.png" alt="Handle Down" class="handle-down">
+            <img src="assets/handle.webp" alt="Handle Up" class="handle-up">
+            <img src="assets/handle2.webp" alt="Handle Down" class="handle-down">
           </div>
 
           <div class="reel-aspect-wrapper">
@@ -467,7 +432,7 @@
     <!-- ── 코인 비 효과 ── -->
     <div class="coin-rain-container" v-if="showCoinRain">
       <div v-for="coin in coins" :key="coin.id" class="coin-particle" :style="coin.style">
-        <img src="assets/bc.png" alt="BC Coin">
+        <img src="assets/bc.webp" alt="BC Coin">
       </div>
     </div>
 
