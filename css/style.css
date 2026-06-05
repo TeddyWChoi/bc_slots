@@ -352,6 +352,13 @@ ul {
   /* Enable 3D perspective for child animations like the handle */
 }
 
+.slot-cabinet {
+  position: relative;
+  width: 100%;
+  padding-top: 76.75%;
+  z-index: 10;
+}
+
 .slot-frame-img {
   position: absolute;
   inset: 0;
@@ -363,10 +370,9 @@ ul {
 }
 
 .reel-aspect-wrapper {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 10;
-  width: 100%;
-  padding-top: 76.75%;
 }
 
 .reel-viewport {
@@ -2604,5 +2610,260 @@ ul {
 
   100% {
     transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   📱 MOBILE & TABLET RESPONSIVE OVERRIDES
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* 메인 레이아웃 및 여백 조절 */
+  .main-layout {
+    flex-direction: column;
+    margin-top: 8px;
+    padding: 0 10px;
+  }
+
+  .center-panel {
+    padding: 0;
+  }
+
+  .mega-banner {
+    max-width: 480px;
+    top: -20px;
+    margin-bottom: -10%;
+  }
+
+  /* 슬롯 캐비닛 & 릴 비율 유지 */
+  .slot-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* 하단 조작부: 캐비닛 밖으로 빼서 모바일/태블릿 최적화 레이아웃으로 변경 */
+  .bottom-controls {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    height: auto;
+    margin-top: 16px;
+    background: linear-gradient(180deg, rgba(30, 8, 8, 0.98) 0%, rgba(15, 3, 3, 0.99) 100%);
+    border: 1.5px solid rgba(212, 175, 55, 0.5);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(255, 215, 0, 0.05);
+  }
+
+  .bottom-controls .locked-overlay {
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  /* 컨트롤 그리드: 2열 레이아웃 (배팅, 예산 / 하단 스핀 전체 너비) */
+  .control-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    height: auto;
+    padding: 0;
+  }
+
+  .ctrl-col {
+    gap: 8px;
+  }
+
+  /* 배팅 및 예산 버튼 크기 최적화 */
+  .bet-adj-row {
+    height: 36px;
+    gap: 4px;
+  }
+
+  .bet-ctrl-input {
+    font-size: 12px;
+  }
+
+  .btn-ctrl-sq {
+    width: 32px;
+    height: 36px;
+    font-size: 12px;
+  }
+
+  .btn-max {
+    height: 36px;
+    font-size: 11px;
+  }
+
+  .budget-btn-row {
+    height: 36px;
+    gap: 4px;
+  }
+
+  .budget-ctrl-input {
+    font-size: 11px;
+  }
+
+  .btn-ctrl-wide {
+    font-size: 11px;
+  }
+
+  /* 스핀 조작부 (가로로 배치) */
+  .col-spin {
+    grid-column: span 2;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+    border-top: 1px solid rgba(212, 175, 55, 0.15);
+    padding-top: 12px;
+  }
+
+  .col-spin .ctrl-display {
+    flex: 1;
+    height: 52px;
+    margin: 0;
+  }
+
+  .col-spin .spin-actions {
+    flex: 1.8;
+    flex-direction: row;
+    height: 52px;
+    gap: 8px;
+  }
+
+  .btn-auto {
+    height: 52px;
+    padding: 0 4px;
+  }
+
+  .btn-spin-sq {
+    height: 52px;
+    font-size: 16px;
+  }
+
+  /* 이벤트 타이머 크기 조정 */
+  .event-timer-wrap {
+    max-width: 340px;
+    height: auto;
+    margin-top: 20px;
+  }
+
+  .evt-timer-box {
+    padding: 10px 12px;
+  }
+
+  .evt-timer-header {
+    font-size: 11px;
+  }
+
+  .evt-digit {
+    font-size: 22px;
+    width: 46px;
+    padding: 2px 4px;
+  }
+
+  .evt-digit-label {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .evt-colon {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* 헤더 모바일 2줄 대응 */
+  .app-header {
+    height: auto;
+    min-height: 56px;
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .header-logo {
+    flex: 0 0 auto;
+  }
+
+  .header-logo img {
+    height: 18px;
+  }
+
+  .header-title {
+    flex: 1 1 auto;
+    justify-content: flex-start;
+    padding-left: 8px;
+  }
+
+  .header-title img {
+    height: 22px;
+  }
+
+  .header-actions {
+    flex: 0 0 100%;
+    width: 100%;
+    justify-content: space-between;
+    border-top: 1px solid rgba(212, 175, 55, 0.1);
+    padding-top: 6px;
+    margin-top: 2px;
+  }
+
+  /* 모드 토글을 Sign In 버튼 옆으로 예쁘게 정렬 */
+  .mode-toggle-pill {
+    position: static;
+    transform: none;
+    height: 26px;
+    padding: 2px 4px;
+  }
+
+  .mode-toggle-label {
+    font-size: 8px;
+    padding-right: 3px;
+    margin-right: 2px;
+  }
+
+  .mode-toggle-btn {
+    font-size: 8px;
+    padding: 2px 6px;
+  }
+
+  .btn-signin,
+  .btn-signout {
+    height: 26px;
+    font-size: 10px;
+    padding: 0 12px;
+  }
+
+  /* 하단 안내 영역 모바일 스타일 */
+  .notice-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 0;
+  }
+
+  .notice-btns {
+    position: static;
+  }
+
+  .notice-body {
+    padding: 16px 0;
+    gap: 16px;
+  }
+
+  /* 메가 잭팟 모달 글자 크기 조정 */
+  .win-title {
+    font-size: 40px !important;
+  }
+
+  .win-box-popup {
+    padding: 30px 20px;
+    gap: 16px;
+  }
+
+  .win-detail-earn {
+    font-size: 22px;
   }
 }

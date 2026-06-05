@@ -29,28 +29,28 @@
         <img src="assets/title.webp" alt="BlackShot Slots" onerror="this.style.display='none'">
       </div>
       <div class="header-actions">
+        <!-- MODE TOGGLE: 이제 header-actions 내부에 유연하게 배치 -->
+        <div class="mode-toggle-pill">
+          <span class="mode-toggle-label">MODE</span>
+          <button
+            class="mode-toggle-btn"
+            data-mode="test"
+            :class="{ active: gameMode === 'test' }"
+            @click="gameMode = 'test'"
+          >
+            <span class="mode-dot"></span>TEST
+          </button>
+          <button
+            class="mode-toggle-btn"
+            data-mode="normal"
+            :class="{ active: gameMode === 'normal' }"
+            @click="gameMode = 'normal'"
+          >
+            <span class="mode-dot"></span>NORMAL
+          </button>
+        </div>
         <button :class="isLoggedIn ? 'btn-signout' : 'btn-signin'" @click="toggleLogin">
           {{ isLoggedIn ? 'SIGN OUT' : 'SIGN IN' }}
-        </button>
-      </div>
-      <!-- MODE TOGGLE: absolute 포지션, 레이아웃에 영향 없음 -->
-      <div class="mode-toggle-pill">
-        <span class="mode-toggle-label">MODE</span>
-        <button
-          class="mode-toggle-btn"
-          data-mode="test"
-          :class="{ active: gameMode === 'test' }"
-          @click="gameMode = 'test'"
-        >
-          <span class="mode-dot"></span>TEST
-        </button>
-        <button
-          class="mode-toggle-btn"
-          data-mode="normal"
-          :class="{ active: gameMode === 'normal' }"
-          @click="gameMode = 'normal'"
-        >
-          <span class="mode-dot"></span>NORMAL
         </button>
       </div>
     </header>
@@ -251,46 +251,48 @@
 
         <!-- 슬롯 프레임 + 릴 -->
         <div class="slot-container">
-          <img src="assets/slotframe.webp" alt="Slot Frame" class="slot-frame-img" onerror="this.style.opacity='0'">
+          <div class="slot-cabinet">
+            <img src="assets/slotframe.webp" alt="Slot Frame" class="slot-frame-img" onerror="this.style.opacity='0'">
 
-          <!-- 손잡이 (Handle) -->
-          <div class="slot-handle-container" :class="{ spinning: spinning, returning: handleReturning, disabled: !isLoggedIn || spinning }" @click="handleHandleClick">
-            <img src="assets/handle.webp" alt="Handle Up" class="handle-up">
-            <img src="assets/handle2.webp" alt="Handle Down" class="handle-down">
-          </div>
+            <!-- 손잡이 (Handle) -->
+            <div class="slot-handle-container" :class="{ spinning: spinning, returning: handleReturning, disabled: !isLoggedIn || spinning }" @click="handleHandleClick">
+              <img src="assets/handle.webp" alt="Handle Up" class="handle-up">
+              <img src="assets/handle2.webp" alt="Handle Down" class="handle-down">
+            </div>
 
-          <div class="reel-aspect-wrapper">
-            <div class="reel-viewport" ref="reelViewport">
-              <div class="reel-inner">
+            <div class="reel-aspect-wrapper">
+              <div class="reel-viewport" ref="reelViewport">
+                <div class="reel-inner">
 
-                <!-- 릴 3개 -->
-                <div v-for="(reel, colIdx) in reels" :key="colIdx" class="reel-col">
-                  <!-- 중앙 라인 -->
-                  <div
-                    style="position:absolute;left:0;right:0;z-index:10;pointer-events:none;border-top:1px solid rgba(255,215,0,0.2);border-bottom:1px solid rgba(255,215,0,0.2);"
-                    :style="{ top: cellH + 'px', height: cellH + 'px' }"></div>
-                  <!-- 당첨 하이라이트 -->
-                  <div v-if="winResult && reel.stopped"
-                    style="position:absolute;left:0;right:0;z-index:10;border-top:3px solid #ffd700;border-bottom:3px solid #ffd700;background:rgba(255,215,0,0.07);box-shadow:inset 0 0 30px rgba(255,215,0,0.35);pointer-events:none;"
-                    :style="{ top: cellH + 'px', height: cellH + 'px' }"></div>
+                  <!-- 릴 3개 -->
+                  <div v-for="(reel, colIdx) in reels" :key="colIdx" class="reel-col">
+                    <!-- 중앙 라인 -->
+                    <div
+                      style="position:absolute;left:0;right:0;z-index:10;pointer-events:none;border-top:1px solid rgba(255,215,0,0.2);border-bottom:1px solid rgba(255,215,0,0.2);"
+                      :style="{ top: cellH + 'px', height: cellH + 'px' }"></div>
+                    <!-- 당첨 하이라이트 -->
+                    <div v-if="winResult && reel.stopped"
+                      style="position:absolute;left:0;right:0;z-index:10;border-top:3px solid #ffd700;border-bottom:3px solid #ffd700;background:rgba(255,215,0,0.07);box-shadow:inset 0 0 30px rgba(255,215,0,0.35);pointer-events:none;"
+                      :style="{ top: cellH + 'px', height: cellH + 'px' }"></div>
 
-                  <div class="reel-strip" :style="{
-                    transform: 'translateY(' + reel.translateY + 'px)',
-                    transition: reel.transitioning ? 'transform 0.9s cubic-bezier(0.12,0.9,0.3,1)' : 'none',
-                    filter: reel.blurred ? 'blur(4px)' : 'none',
-                  }">
-                    <div v-for="(sym, rowIdx) in reel.strip" :key="rowIdx" class="sym-cell"
-                      :style="{ height: cellH + 'px' }">
-                      <div class="sym-inner"
-                        :style="{ width: Math.max(44, Math.min(cellH * 0.75, 92)) + 'px', height: Math.max(44, Math.min(cellH * 0.75, 92)) + 'px' }">
-                        <img v-if="sym.imgUrl" :src="sym.imgUrl" :style="imgStyle(sym, colIdx, rowIdx, reel)"
-                          :alt="sym.name">
-                        <span v-else :style="symStyle(sym, colIdx, rowIdx, reel)">{{ sym.emoji }}</span>
+                    <div class="reel-strip" :style="{
+                      transform: 'translateY(' + reel.translateY + 'px)',
+                      transition: reel.transitioning ? 'transform 0.9s cubic-bezier(0.12,0.9,0.3,1)' : 'none',
+                      filter: reel.blurred ? 'blur(4px)' : 'none',
+                    }">
+                      <div v-for="(sym, rowIdx) in reel.strip" :key="rowIdx" class="sym-cell"
+                        :style="{ height: cellH + 'px' }">
+                        <div class="sym-inner"
+                          :style="{ width: Math.max(44, Math.min(cellH * 0.75, 92)) + 'px', height: Math.max(44, Math.min(cellH * 0.75, 92)) + 'px' }">
+                          <img v-if="sym.imgUrl" :src="sym.imgUrl" :style="imgStyle(sym, colIdx, rowIdx, reel)"
+                            :alt="sym.name">
+                          <span v-else :style="symStyle(sym, colIdx, rowIdx, reel)">{{ sym.emoji }}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
+                </div>
               </div>
             </div>
           </div>
