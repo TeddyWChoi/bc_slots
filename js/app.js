@@ -586,7 +586,7 @@ new Vue({
       const fr = buildReelsFromOutcome(outcome);
       this.finalReels = fr;
 
-      const stopDelays = [1000, 1500, 2000];
+      const stopDelays = [1000, 1800, 2600];
       let stoppedCount = 0;
 
       this.reels.forEach((reel, i) => {
