@@ -94,7 +94,7 @@ const TEST_OUTCOME_TOTAL = TEST_OUTCOME_TABLE.reduce((a, o) => a + o.weight, 0);
 
 const MIN_BET = 10;
 const MAX_BET = 1000;
-const BET_OPTIONS = [10, 50, 100, 300, 500, 1000];
+
 const INITIAL_BALANCE = 60000;
 const LOSE_AUTO_DELAY = 1200;
 const BREAK_AUTO_DELAY = 1200;
@@ -198,6 +198,7 @@ function buildReelsFromOutcome(outcome) {
     const r2 = rand(nonMystery);
     if (r0.id === r1.id) continue; // 2매치 방지
     if (r1.id === r2.id) continue;
+    if (r0.id === r2.id) continue; // 1-3번째 릴 동일 방지
     return [r0, r1, r2];
   }
   // fallback
@@ -574,6 +575,7 @@ new Vue({
       this.winResult = null;
       this.showWin = false;
       this.showLose = false;
+      this.showBreakEven = false;
       this.displayWin = 0;
       this.showRespinOverlay = false;
 
