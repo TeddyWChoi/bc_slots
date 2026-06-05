@@ -2707,15 +2707,26 @@ ul {
     font-size: 11px;
   }
 
-  /* 스핀 조작부 (가로로 배치) */
+  .col-bet {
+    order: 2;
+  }
+
+  .col-budget {
+    order: 3;
+  }
+
+  /* 스핀 조작부 (상단에 배치) */
   .col-spin {
+    order: 1;
     grid-column: span 2;
     flex-direction: row;
     align-items: center;
     gap: 10px;
-    margin-top: 4px;
-    border-top: 1px solid rgba(212, 175, 55, 0.15);
-    padding-top: 12px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+    padding-bottom: 12px;
+    border-top: none;
+    padding-top: 0;
   }
 
   .col-spin .ctrl-display {
