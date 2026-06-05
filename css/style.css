@@ -2640,14 +2640,13 @@ ul {
     margin: 0 auto;
   }
 
-  /* 하단 조작부: 캐비닛 밖으로 빼서 모바일/태블릿 최적화 레이아웃으로 변경 */
   .bottom-controls {
     position: relative;
     left: auto;
     right: auto;
     bottom: auto;
     height: auto;
-    margin-top: 16px;
+    margin-top: 6px;
     background: linear-gradient(180deg, rgba(30, 8, 8, 0.98) 0%, rgba(15, 3, 3, 0.99) 100%);
     border: 1.5px solid rgba(212, 175, 55, 0.5);
     border-radius: 16px;
