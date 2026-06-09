@@ -45,6 +45,9 @@ const OUTCOME_TABLE = [
   { type: '3match', id: 'knife',   weight: 240 },  // ×15   MED
   { type: '3match', id: 'grenade', weight: 428 },  // ×8    SMALL
   { type: '3match', id: 'pistol',  weight: 892 },  // ×5    SMALL
+  // 스페셜 콤보
+  { type: 'special', id: 0,        weight: 5   },  // Crown-Skull-Crown ×200
+  { type: 'special', id: 1,        weight: 15  },  // Skull-Smile-Skull ×50
   // 2매치 당첨
   { type: '2match', id: 'crown',   weight: 563 },  // ×10
   { type: '2match', id: 'skull',   weight: 928 },  // ×5
@@ -57,7 +60,7 @@ const OUTCOME_TABLE = [
   // 프리스핀
   { type: 'respin', id: 'mystery', weight: 5000 }, // Free Spin 5%
   // 꽝
-  { type: 'miss',   id: null,      weight: 53500 }, // Miss 53.5%
+  { type: 'miss',   id: null,      weight: 53480 }, // Miss 53.48%
 ];
 const OUTCOME_TOTAL = OUTCOME_TABLE.reduce((a, o) => a + o.weight, 0);
 
@@ -73,6 +76,9 @@ const TEST_OUTCOME_TABLE = [
   { type: '3match', id: 'knife',   weight: 5000 },  // MED     ×15
   { type: '3match', id: 'grenade', weight: 5000 },  // SMALL   ×8
   { type: '3match', id: 'pistol',  weight: 5000 },  // SMALL   ×5
+  // 스페셜 콤보 (테스트: 상향)
+  { type: 'special', id: 0,        weight: 3000 },  // Crown-Skull-Crown ×200
+  { type: 'special', id: 1,        weight: 3000 },  // Skull-Smile-Skull ×50
   // 2매치 당첨
   { type: '2match', id: 'crown',   weight: 3000 },  // ×10
   { type: '2match', id: 'skull',   weight: 3000 },  // ×5
@@ -108,7 +114,7 @@ const CHARACTERS = [
   { id: 'assault', name: 'Assault' },
 ];
 
-const STRIP_SIZE = 60;
+const STRIP_SIZE = 120;
 const REEL_SPEED = 1600; // px/sec
 
 // ============================================================================
@@ -181,6 +187,11 @@ function buildReelsFromOutcome(outcome) {
     const s = symOf(outcome.id);
     const others = nonMystery.filter(x => x.id !== outcome.id);
     return [s, s, rand(others)];
+  }
+  if (outcome.type === 'special') {
+    // SPECIAL_COMBOS[outcome.id]의 심볼 조합을 그대로 반환
+    const combo = SPECIAL_COMBOS[outcome.id];
+    return combo.ids.map(id => symOf(id));
   }
   if (outcome.type === 'respin') {
     // ❓ 는 세 번째 릴에만 등장
@@ -297,9 +308,9 @@ const WINNERS = [
   { nick: 'Te***', date: 'May.07', prize: 'MEGA JACKPOT', multi: '× 1000', icon: '👑' },
   { nick: 'Bl***', date: 'May.07', prize: 'JACKPOT', multi: '× 100', icon: '💀' },
   { nick: 'Sn***', date: 'May.06', prize: 'MEGA JACKPOT', multi: '× 1000', icon: '👑' },
-  { nick: 'Gh***', date: 'May.06', prize: 'JACKPOT', multi: '× 500', icon: '💀' },
+  { nick: 'Gh***', date: 'May.06', prize: 'JACKPOT', multi: '× 100', icon: '💀' },
   { nick: 'Ra***', date: 'May.05', prize: 'MEGA JACKPOT', multi: '× 1000', icon: '👑' },
-  { nick: 'Xv***', date: 'May.05', prize: 'JACKPOT', multi: '× 300', icon: '💀' },
+  { nick: 'Xv***', date: 'May.05', prize: 'SPECIAL COMBO', multi: '× 200', icon: '👑💀👑' },
   { nick: 'Mg***', date: 'May.04', prize: 'MEGA JACKPOT', multi: '× 1000', icon: '👑' },
   { nick: 'Dr***', date: 'May.04', prize: 'JACKPOT', multi: '× 100', icon: '💀' },
 ];
@@ -520,12 +531,9 @@ new Vue({
 
     // ── 오토 스핀 토글 ──
     toggleAuto() {
-      if (this.spinning && !this.autoActive) return; // 이미 돌고 있는데 켤 수는 없음 (선택적 제한)
       this.autoActive = !this.autoActive;
       sound.playClick();
-      if (this.autoActive && !this.spinning) {
-        this.doSpin();
-      } else if (!this.autoActive) {
+      if (!this.autoActive) {
         clearTimeout(this._autoSpinTimeout);
         clearTimeout(this._loseHideTimeout);
       }
@@ -534,6 +542,11 @@ new Vue({
     // ── 스핀 버튼 클릭 ──
     handleSpinClick() {
       if (this.spinning || this._spinLock) return;
+      if (!this.isLoggedIn) {
+        this.alertMessage = "PLEASE SIGN IN FIRST TO SPIN";
+        this.showAlert = true;
+        return;
+      }
       this.doSpin();
       sound.playClick();
     },
@@ -673,7 +686,6 @@ new Vue({
 
       if (result) {
         this.sessionBudget += result.winAmount;
-        this.lastWinAmt = result.winAmount;
         // break(본전) → BREAK EVEN 팝업 표시, 오토스핀 시 1.2초 후 자동 닫힘
         if (result.tier === 'break') {
           this.showBreakEven = true;
@@ -685,6 +697,7 @@ new Vue({
           this._spinLock = false;
           return;
         }
+        this.lastWinAmt = result.winAmount;
         this.showWin = true;
         this.startCountup(result.winAmount);
         this.triggerConfetti(result.tier);
@@ -695,6 +708,13 @@ new Vue({
         // JACKPOT: 폭죽만 (triggerConfetti에서 처리됨)
         if (fr[2].id === 'mystery') {
           this.hasPendingRespin = true;
+        }
+        // Auto Spin 시 Win 오버레이 자동 닫힘 (mega/jackpot: 5초, 그 외: 3초)
+        if (this.autoActive) {
+          const autoWinDelay = (result.tier === 'mega' || result.tier === 'jackpot') ? 5000 : 3000;
+          this._winHideTimeout = setTimeout(() => {
+            this.confirmWin();
+          }, autoWinDelay);
         }
       } else if (fr[2].id === 'mystery') {
         this.showRespinOverlay = true;
@@ -885,6 +905,9 @@ new Vue({
         this.selectedChar = '';
         this.currentCharacter = 'assets/character.webp';
         this.autoActive = false; // Turn off auto spin if active
+        clearTimeout(this._autoSpinTimeout); // 예약된 auto spin 즉시 취소
+        clearTimeout(this._loseHideTimeout);
+        clearTimeout(this._winHideTimeout);
       } else {
         // Sign In
         this.isLoggedIn = true;

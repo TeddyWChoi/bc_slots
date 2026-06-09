@@ -5,10 +5,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; connect-src 'self';">
   <title>BC Slot – BlackShot Gacha</title>
   <link rel="stylesheet" href="css/style.css?v=30">
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js"
+    integrity="sha384-05dHfbm/L0COkFLQ5ghEDllrtj0kD1/46h3bAPxuPjWq9/IDglEo6RtZefYkYfpk"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"
+    integrity="sha384-Rv68Y7adOjMMJc1/xFMcdNvXre/HF51to4GZjBALmXr7ABnVl5V4UajJwBu7zbhN"
+    crossorigin="anonymous"></script>
   
 </head>
 
@@ -17,16 +22,19 @@
 
     <!-- ── 배경 이미지 ── -->
     <div class="bg-layer">
-      <img src="assets/bg.webp" alt="" onerror="this.style.display='none'">
+      <img src="assets/bg.webp" alt="" class="bg-fallback">
       <div class="bg-overlay"></div>
     </div>
 
     <header class="app-header" :class="{ 'test-mode-active': gameMode === 'test' }">
       <div class="header-logo">
-        <img src="assets/logo.webp" alt="Logo" onerror="this.style.display='none'">
+        <img src="assets/logo.webp" alt="Logo" class="img-fallback">
       </div>
       <div class="header-title">
-        <img src="assets/title.webp" alt="BlackShot Slots" onerror="this.style.display='none'">
+        <img src="assets/title.webp" alt="BlackShot Slots" class="img-fallback">
+        <button class="mobile-signin-btn" :class="isLoggedIn ? 'btn-signout' : 'btn-signin'" @click="toggleLogin">
+          {{ isLoggedIn ? 'SIGN OUT' : 'SIGN IN' }}
+        </button>
       </div>
       <div class="header-actions">
         <!-- MODE TOGGLE: 이제 header-actions 내부에 유연하게 배치 -->
@@ -110,7 +118,7 @@
                 <img src="assets/symbol3.webp" class="pf-sym-img-sm" alt="Skull">
                 <img src="assets/symbol1.webp" class="pf-sym-img-sm" alt="Crown">
               </div>
-              <div class="pf-sym-mult text-gold">×200</div>
+              <div class="pf-sym-mult text-purple">×200</div>
               <div class="pf-sym-name">SPECIAL COMBO</div>
             </div>
             <!-- JACKPOT -->
@@ -125,13 +133,13 @@
               <div class="pf-sym-name">JACKPOT</div>
             </div>
             <!-- SPECIAL COMBO 2 (x50) -->
-            <div class="pf-card pf-tier-special span-1">
+            <div class="pf-card pf-tier-rare span-1">
               <div class="pf-sym-combo-wrap">
                 <img src="assets/symbol3.webp" class="pf-sym-img-sm" alt="Skull">
                 <img src="assets/symbol7.webp" class="pf-sym-img-sm" alt="Smile">
                 <img src="assets/symbol3.webp" class="pf-sym-img-sm" alt="Skull">
               </div>
-              <div class="pf-sym-mult text-gold" style="font-size: 14px; margin-top: 1px;">×50</div>
+              <div class="pf-sym-mult text-cyan" style="font-size: 14px; margin-top: 1px;">×50</div>
               <div class="pf-sym-name" style="font-size: 7px;">SPECIAL COMBO</div>
             </div>
             <!-- BIG -->
@@ -246,13 +254,12 @@
       <main class="center-panel">
 
         <!-- 메가잭팟 배너 -->
-        <img src="assets/megabanner.webp" alt="MEGA JACKPOT SLOTS" class="mega-banner"
-          onerror="this.style.display='none'">
+        <img src="assets/megabanner.webp" alt="MEGA JACKPOT SLOTS" class="mega-banner img-fallback">
 
         <!-- 슬롯 프레임 + 릴 -->
         <div class="slot-container">
           <div class="slot-cabinet">
-            <img src="assets/slotframe.webp" alt="Slot Frame" class="slot-frame-img" onerror="this.style.opacity='0'">
+            <img src="assets/slotframe.webp" alt="Slot Frame" class="slot-frame-img img-fallback">
 
             <!-- 손잡이 (Handle) -->
             <div class="slot-handle-container" :class="{ spinning: spinning, returning: handleReturning, disabled: !isLoggedIn || spinning }" @click="handleHandleClick">
@@ -300,23 +307,7 @@
           <!-- ── 하단 컨트롤 ── -->
           <div class="bottom-controls">
             <div class="control-grid">
-              <!-- 1열: I BET -->
-              <div class="ctrl-col col-bet">
-                <div class="ctrl-display">
-                  <div class="ctrl-label">MY BET</div>
-                  <div class="ctrl-val text-gold">{{ fmtNum(bet) }} BC</div>
-                </div>
-                <div class="ctrl-actions">
-                  <div class="bet-adj-row">
-                    <button class="btn-ctrl-sq" @click="changeBet(-1)" :disabled="spinning">−</button>
-                    <input type="number" class="bet-ctrl-input" v-model="betInput" :min="10" :max="1000" :disabled="spinning" @change="setBetFromInput" @blur="setBetFromInput">
-                    <button class="btn-ctrl-sq" @click="changeBet(1)" :disabled="spinning">+</button>
-                  </div>
-                  <button class="btn-ctrl-wide btn-max" @click="handleMaxBet" :disabled="spinning">MAX BET</button>
-                </div>
-              </div>
-
-              <!-- 2열: SESSION BUDGET -->
+              <!-- 1열: SESSION BUDGET -->
               <div class="ctrl-col col-budget">
                 <div class="ctrl-display">
                   <div class="ctrl-label">SESSION BUDGET</div>
@@ -336,6 +327,22 @@
                 </div>
               </div>
 
+              <!-- 2열: MY BET -->
+              <div class="ctrl-col col-bet">
+                <div class="ctrl-display">
+                  <div class="ctrl-label">MY BET</div>
+                  <div class="ctrl-val text-gold">{{ fmtNum(bet) }} BC</div>
+                </div>
+                <div class="ctrl-actions">
+                  <div class="bet-adj-row">
+                    <button class="btn-ctrl-sq" @click="changeBet(-1)" :disabled="spinning">−</button>
+                    <input type="number" class="bet-ctrl-input" v-model="betInput" :min="10" :max="1000" :disabled="spinning" @change="setBetFromInput" @blur="setBetFromInput">
+                    <button class="btn-ctrl-sq" @click="changeBet(1)" :disabled="spinning">+</button>
+                  </div>
+                  <button class="btn-ctrl-wide btn-max" @click="handleMaxBet" :disabled="spinning">MAX BET</button>
+                </div>
+              </div>
+
               <!-- 3열: WIN & 스핀조작 -->
               <div class="ctrl-col col-spin">
                 <div class="ctrl-display">
@@ -347,11 +354,11 @@
                     <span class="auto-txt">AUTO</span>
                     <span class="auto-status">{{ autoActive ? 'ON' : 'OFF' }}</span>
                   </button>
-                  <button class="btn-spin-sq" :class="{ active: spinning }" @click="handleSpinClick" :disabled="spinning || (isLoggedIn && sessionBudget < bet)">
+                  <button class="btn-spin-sq" :class="{ active: spinning }" @click="handleSpinClick" :disabled="!isLoggedIn || spinning || (isLoggedIn && sessionBudget < bet)">
                     SPIN
                   </button>
+                </div>
               </div>
-            </div>
           </div>
 
           <!-- Lock Overlay -->
@@ -370,7 +377,7 @@
             <div class="evt-timer-header">Mar.01 2026 to Mar.31 2026(CET)</div>
             <div class="evt-timer-digits">
               <div class="evt-digit-group">
-                <div class="evt-digit">{{ fmtTime(timerD || 22) }}</div>
+                <div class="evt-digit">{{ fmtTime(timerD) }}</div>
                 <div class="evt-digit-label">DAYS</div>
               </div>
               <div class="evt-colon">:</div>
@@ -513,8 +520,8 @@
                 <div class="history-date">{{ rec.date }}</div>
                 <div class="history-bet">Bet: {{ fmtNum(rec.bet) }} BC</div>
               </div>
-              <div :style="{ color: rec.winAmount > 0 ? '#22c55e' : '#f87171', fontWeight: 900, fontSize: '14px' }">
-                {{ rec.winAmount > 0 ? '+' + fmtNum(rec.winAmount) : '-' + fmtNum(rec.bet) }}
+              <div :style="{ color: rec.winAmount > rec.bet ? '#22c55e' : rec.winAmount === rec.bet ? '#94a3b8' : rec.winAmount > 0 ? '#22c55e' : '#f87171', fontWeight: 900, fontSize: '14px' }">
+                {{ rec.winAmount > rec.bet ? '+' + fmtNum(rec.winAmount) : rec.winAmount === rec.bet ? '±0' : rec.winAmount > 0 ? '+' + fmtNum(rec.winAmount) : '-' + fmtNum(rec.bet) }}
               </div>
             </div>
           </div>
