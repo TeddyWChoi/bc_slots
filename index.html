@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; connect-src 'self';">
   <title>BC Slot – BlackShot Gacha</title>
-  <link rel="stylesheet" href="css/style.css?v=30">
+  <link rel="stylesheet" href="css/style.css?v=31">
   <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js"
     integrity="sha384-05dHfbm/L0COkFLQ5ghEDllrtj0kD1/46h3bAPxuPjWq9/IDglEo6RtZefYkYfpk"
     crossorigin="anonymous"></script>
@@ -87,11 +87,20 @@
       </div>
     </div>
 
+    <!-- ── 모바일 드로어 백드롭 & 트리거 버튼 ── -->
+    <div class="drawer-backdrop" v-if="showMobileDrawer" @click="showMobileDrawer = false"></div>
+    <button class="drawer-trigger-btn" @click="showMobileDrawer = true" v-if="!showMobileDrawer" aria-label="Open menu">
+      <span class="trigger-icon">⚡</span>
+      <span class="trigger-text">PAYTABLE & CHAR</span>
+    </button>
+
     <!-- ── 메인 레이아웃 ── -->
     <div class="main-layout">
 
       <!-- ──────── 좌측 패널 ──────── -->
-      <aside class="left-panel">
+      <aside class="left-panel" :class="{ 'drawer-open': showMobileDrawer }">
+        <!-- Close Button for Mobile Drawer -->
+        <button class="drawer-close-btn" @click="showMobileDrawer = false" aria-label="Close menu">&times;</button>
 
         <!-- 화려한 인라인 페이테이블 -->
         <div class="paytable-fancy">

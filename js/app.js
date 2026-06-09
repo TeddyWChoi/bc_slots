@@ -366,6 +366,7 @@ new Vue({
 
       history: [],
       showHistory: false,
+      showMobileDrawer: false,
 
       // 릴 상태 (translateY가 Vue reactive로 관리됨)
       reels: [makeReel(false), makeReel(false), makeReel(true)],
