@@ -1,290 +1,148 @@
-# 🔓 BC Slot — 보안 취약점 보고서 (Penetration Test Report)
+# 🔐 BC Slot — 보안 검토 보고서 (Security Review Report)
 
 > **대상**: [index.html](file:///Users/vertigo_teddy/Documents/ai_publishing/bc_slot/dist/index.html), [app.js](file:///Users/vertigo_teddy/Documents/ai_publishing/bc_slot/dist/js/app.js)
-> **검토 일시**: 2026-06-09
-> **검토 관점**: 공격자(해커) 시점
+> **검토 일시**: 2026-06-10 (v2.1 기준)
+> **현재 상태**: 로컬 클라이언트 사이드 데모 (BC = 가상 재화, 실제 거래 없음)
+> **대상 환경**: 향후 백엔드 연동 실서비스 전환 시를 기준으로 작성
 
 ---
 
-## 요약: 발견된 취약점 18건
+## 📌 아키텍처 전제
 
-| 등급 | 건수 | 설명 |
-|:---:|:---:|------|
-| 💀 **CRITICAL** | 5건 | 게임 결과/잔고 직접 조작, 인증 우회 |
-| 🔴 **HIGH** | 5건 | RNG 예측, 베팅값 조작, 공급망 공격 |
-| 🟠 **MEDIUM** | 4건 | CSP 부재, 히스토리 위조, 타이머 조작 |
-| 🟡 **LOW** | 4건 | 인라인 이벤트핸들러, 프로토타입 오염 등 |
+현재 코드는 **100% 클라이언트 사이드 JavaScript** 구조입니다. 이는 BC가 실제 재화가 아닌 가상 포인트인 데모 단계에서는 문제가 없습니다. 그러나 실서비스 전환 시 백엔드 도입이 필수이며, 그 시점에 대부분의 취약점은 **구조적으로 해소**됩니다.
 
-> [!CAUTION]
-> **근본 원인**: 모든 게임 로직(RNG, 잔고 관리, 베팅, 당첨 판정)이 **클라이언트 사이드 JavaScript**에서 실행됩니다. 브라우저 DevTools만 열면 전체 게임 상태를 읽고 쓸 수 있습니다.
-
----
-
-## 💀 CRITICAL — 즉시 악용 가능
-
-### CVE-BC-001: Vue 인스턴스 직접 조작으로 잔고 무한 충전
-
-```js
-// 브라우저 콘솔에 한 줄만 입력하면 됨
-const vm = document.querySelector("#app").__vue__
-vm.balance = 999999999
-vm.sessionBudget = 999999999
+```
+현재 (데모)         →    실서비스 전환 후
+─────────────────────────────────────────────
+100% 클라이언트      →    클라이언트 = 애니메이션 재생기
+클라이언트가 RNG     →    서버가 RNG + 결과 판정
+클라이언트가 잔고    →    서버 DB가 잔고 관리
+Boolean 로그인       →    JWT / 세션 인증
 ```
 
-| 항목 | 상세 |
-|------|------|
-| **영향** | 잔고(balance)와 세션 예산(sessionBudget)을 임의 금액으로 설정 가능 |
-| **난이도** | ⭐ (초보자도 가능) |
-| **대응** | 서버 사이드에서 잔고 관리 필수. 클라이언트 값은 화면 표시용으로만 사용 |
+---
+
+## ✅ 백엔드 도입으로 자동 해소되는 항목 (9건)
+
+> [!NOTE]
+> 아래 항목들은 **실서비스 전환 시 서버 사이드 처리로 구조적으로 해결**됩니다.
+> 현재 데모 단계에서는 BC가 실제 재화가 아니므로 실질적 피해가 없습니다.
+
+| # | 현재 취약점 | 실서비스 해소 방법 |
+|---|------------|-------------------|
+| 1 | 잔고(`balance`) DevTools로 직접 수정 가능 | 서버 DB에서 잔고 관리 → 클라이언트 값은 표시용 |
+| 2 | 테스트 모드 강제 전환 (`vm.gameMode = 'test'`) | 모드를 서버에서 제어 → 클라이언트 변수 의미 없음 |
+| 3 | `pickOutcome()`, `calculateWin()` 등 결과 함수 덮어쓰기 | 서버가 결과 판정 후 내려줌 → 클라이언트 함수 무의미 |
+| 4 | `doSpin(true)`로 무료 스핀 무한 호출 | 서버에서 free spin 횟수 검증 |
+| 5 | `vm.isLoggedIn = true` 인증 우회 | JWT/세션 기반 인증 → boolean 토글 불가 |
+| 6 | 베팅금액 음수/초과 조작 (`vm.betAmount = -10000`) | 서버에서 bet 범위 검증 필수 |
+| 7 | `OUTCOME_TABLE` 가중치 직접 변조 | 가중치 테이블을 서버에서 관리 |
+| 8 | `Math.random()` PRNG 예측 가능 | 서버 사이드 CSPRNG (`crypto.randomBytes()`) 사용 |
+| 9 | 히스토리 위조 (가짜 당첨 스크린샷) | 서버 DB에 히스토리 저장 + HMAC 서명 |
 
 ---
 
-### CVE-BC-002: 테스트 모드 강제 전환
+## ⚠️ 실서비스 전환 후에도 별도로 처리해야 하는 항목 (4건)
 
-```js
-vm.gameMode = "test"
-```
-
-| 항목 | 상세 |
-|------|------|
-| **영향** | TEST_OUTCOME_TABLE 적용 → MEGA JACKPOT 확률 **0.009% → 3.57%** (397배 증가) |
-| **난이도** | ⭐ |
-| **추가 위험** | UI의 MODE 토글도 별도 보호 없이 노출되어 있음 |
-| **대응** | 테스트 모드를 프로덕션 빌드에서 완전 제거. 또는 서버에서 모드를 제어 |
+> [!IMPORTANT]
+> 아래 항목들은 백엔드 구조와 무관하게 **프론트엔드 배포 단계에서 직접 처리**해야 합니다.
 
 ---
 
-### CVE-BC-003: 게임 결과 결정 함수 덮어쓰기
-
-```js
-// 방법 1: 매 스핀마다 MEGA JACKPOT 강제
-pickOutcome = () => ({ type: "3match", id: "crown", weight: 9 })
-
-// 방법 2: 당첨금 판정 함수 변조
-calculateWin = (r, b) => ({ winAmount: b * 1000, multiplier: 1000, tier: "mega" })
-```
+### 1. CDN 공급망 공격 (Supply Chain Attack)
 
 | 항목 | 상세 |
 |------|------|
-| **영향** | 게임의 핵심 로직인 `pickOutcome()`, `calculateWin()`, `buildReelsFromOutcome()`이 전역 스코프에 노출. 공격자가 자유롭게 덮어쓸 수 있음 |
-| **난이도** | ⭐⭐ |
-| **대응** | 결과 판정은 반드시 서버에서 수행. 클라이언트는 결과를 수신하여 애니메이션만 재생 |
+| **현황** | Vue.js, canvas-confetti를 jsdelivr CDN에서 로드 |
+| **위험** | CDN이 침해될 경우 악성 스크립트가 사용자 브라우저에서 실행됨 |
+| **백엔드와 무관한 이유** | 서버가 정상이어도 프론트엔드 CDN 스크립트가 변조되면 클라이언트 세션 토큰 탈취 가능 |
+| **난이도** | ⭐⭐⭐⭐⭐ (CDN 자체를 침해해야 하나, 영향은 치명적) |
 
----
-
-### CVE-BC-004: 무료 스핀 무한 호출
-
-```js
-vm._spinLock = false
-vm.doSpin(true)  // isFree = true → 예산 차감 없이 스핀
-
-// 자동화 공격
-setInterval(() => { vm._spinLock = false; vm.doSpin(true) }, 4000)
-```
-
-| 항목 | 상세 |
-|------|------|
-| **영향** | `doSpin(true)`의 `isFree` 파라미터로 예산 차감을 완전히 우회. spinLock도 강제 해제 가능 |
-| **난이도** | ⭐ |
-| **대응** | Free spin 사용 여부를 서버에서 검증. 클라이언트의 isFree 파라미터 신뢰 금지 |
-
----
-
-### CVE-BC-005: 인증 우회 (Authentication Bypass)
-
-```js
-vm.isLoggedIn = true
-vm.selectedChar = 'teddy'
-```
-
-| 항목 | 상세 |
-|------|------|
-| **영향** | 비밀번호, 토큰 없이 로그인 상태 전환 가능. `toggleLogin()`이 단순히 boolean 토글 |
-| **난이도** | ⭐ |
-| **대응** | 서버 인증 시스템(JWT/세션) 도입. 클라이언트 isLoggedIn은 서버 응답 기반으로만 설정 |
-
----
-
-## 🔴 HIGH — 심각한 조작 가능
-
-### CVE-BC-006: PRNG 예측 가능 (Math.random)
-
-| 항목 | 상세 |
-|------|------|
-| **위치** | [pickOutcome()](file:///Users/vertigo_teddy/Documents/ai_publishing/bc_slot/dist/js/app.js#L161-L167) |
-| **영향** | `Math.random()`은 V8의 Xorshift128+ 알고리즘 사용. 약 5개의 연속 출력값으로 내부 상태 복구 가능 → **다음 스핀 결과 예측** |
-| **난이도** | ⭐⭐⭐⭐ (전문 지식 필요) |
-| **도구** | z3 SMT solver, 공개된 V8 PRNG 역추적 스크립트 존재 |
-| **대응** | 서버 사이드에서 `crypto.getRandomValues()` 또는 HSM 기반 TRNG 사용 |
-
----
-
-### CVE-BC-007: 베팅금액 음수/초과 조작
-
-```js
-// 음수 베팅: MISS해도 예산 증가
-vm.betAmount = -10000
-// sessionBudget -= (-10000) → sessionBudget += 10000
-
-// 초과 베팅: MAX_BET(1000) 우회
-vm.betAmount = 999999
-// MEGA 당첨 시: 999,999 × 1000 = 999,999,000 BC
-```
-
-| 항목 | 상세 |
-|------|------|
-| **영향** | `doSpin()`에서 `betAmount` 유효성 검증 없음. `setBetFromInput()`의 클램핑은 UI 입력 시에만 작동하고 직접 `vm.betAmount` 설정 시 우회됨 |
-| **난이도** | ⭐ |
-| **대응** | `doSpin()` 진입 시 `bet` 값의 범위 검증 추가. 서버에서 베팅 금액 검증 필수 |
-
----
-
-### CVE-BC-008: OUTCOME_TABLE 직접 변조
-
-```js
-// MEGA JACKPOT 확률을 99.99%로
-OUTCOME_TABLE[0].weight = 99990
-OUTCOME_TABLE.slice(1).forEach(o => o.weight = 0)
-// OUTCOME_TOTAL도 recalc 필요 없음 - pickOutcome이 실시간 계산하지 않음
-```
-
-| 항목 | 상세 |
-|------|------|
-| **영향** | `OUTCOME_TABLE`과 `OUTCOME_TOTAL`이 전역 `const`이지만 배열/객체 내용은 mutable. `Object.freeze()` 미적용 |
-| **난이도** | ⭐⭐ |
-| **참고** | `OUTCOME_TOTAL`은 초기화 시 한번만 계산되므로 `weight` 변조 후에도 그대로 사용됨 → 가중치 편향 극대화 |
-| **대응** | `Object.freeze()` 적용 + 서버 사이드 결과 결정 |
-
----
-
-### CVE-BC-009: CDN 공급망 공격 (Supply Chain)
+**대응** — 배포 시 SRI(Subresource Integrity) hash 추가:
 
 ```html
-<!-- SRI hash 없이 외부 스크립트 로드 -->
-<script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-```
-
-| 항목 | 상세 |
-|------|------|
-| **영향** | jsdelivr CDN이 침해되면 악성 스크립트가 사용자 브라우저에서 실행됨 |
-| **난이도** | ⭐⭐⭐⭐⭐ (CDN 자체를 침해해야 함. 하지만 발생 시 영향은 치명적) |
-| **대응** | SRI(Subresource Integrity) hash 추가:
-
-```html
+<!-- 현재 코드에 이미 SRI 적용되어 있음 ✅ -->
 <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js"
-  integrity="sha384-[HASH]" crossorigin="anonymous"></script>
+  integrity="sha384-05dHfbm/..."
+  crossorigin="anonymous"></script>
 ```
+
+> [!TIP]
+> 현재 index.html에 이미 Vue에 대한 SRI hash가 적용되어 있습니다. canvas-confetti에도 동일하게 확인 후 유지하세요.
 
 ---
 
-### CVE-BC-010: 소수점 베팅 부동소수점 오류
-
-```js
-vm.betAmount = 0.0001
-// 수천 번 스핀 후 sessionBudget에 부동소수점 오차 누적
-// 예: 999.9999999999998 ≠ 1000
-```
+### 2. Content Security Policy (CSP) 부재
 
 | 항목 | 상세 |
 |------|------|
-| **영향** | betAmount에 정수 강제 검증 없음. 소수점 값이 허용되어 부동소수점 정밀도 오류 발생 가능 |
-| **대응** | `doSpin()` 진입 시 `Math.floor()` 또는 정수 검증 |
+| **현황** | HTTP 응답 헤더에 `Content-Security-Policy` 없음 |
+| **위험** | XSS 취약점 발생 시 공격 코드 실행 제한 없음. 백엔드 JWT 세션 토큰 탈취 가능 |
+| **백엔드와 무관한 이유** | XSS로 서버 세션 토큰이 탈취되면 백엔드 인증도 우회됨 |
+
+**대응** — 웹서버(nginx / Apache / CDN) 설정에서 CSP 헤더 추가:
+
+```nginx
+# nginx 예시
+add_header Content-Security-Policy "
+  default-src 'self';
+  script-src 'self' https://cdn.jsdelivr.net;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data:;
+  media-src 'self';
+  connect-src 'self' https://your-api-domain.com;
+";
+```
 
 ---
 
-## 🟠 MEDIUM — 게임 무결성 위협
-
-### CVE-BC-011: Content Security Policy 부재
+### 3. UI 신뢰도 조작 (타이머 / 당첨자 토스트)
 
 | 항목 | 상세 |
 |------|------|
-| **현황** | HTTP 헤더에도 `<meta>` 태그에도 CSP 없음 |
-| **영향** | XSS 취약점 발견 시 공격자의 코드 실행에 제한 없음 (eval, inline script, 외부 도메인 스크립트 모두 허용) |
-| **대응** | `Content-Security-Policy` 헤더 적용 |
+| **현황** | `vm.timerD`, `WINNERS[]` 등 UI 데이터를 DevTools로 조작 가능 |
+| **실제 위험** | 금전적 피해는 없으나, 조작된 화면을 스크린샷으로 캡처해 사기성 홍보에 악용 가능 |
+| **백엔드와 무관한 이유** | 이벤트 타이머, 당첨자 목록이 서버에서 내려와도 클라이언트에서 변조 가능 |
 
-### CVE-BC-012: 히스토리 위조
+**대응** — 실서비스에서는 당첨자 데이터를 서버 API에서 실시간으로 가져오고, 타이머 종료 시점도 서버 시간 기준으로 검증.
 
-```js
-vm.history = Array.from({length: 100}, (_, i) => ({
-  id: String(Date.now() + i),
-  date: "2026.06.09 12:00",
-  bet: 1000,
-  reels: ["👑","👑","👑"],
-  winAmount: 1000000
-}))
-```
+---
+
+### 4. 프로토타입 오염 / 전역 스코프 (LOW)
 
 | 항목 | 상세 |
 |------|------|
-| **영향** | 가짜 당첨 히스토리 생성 → 스크린샷 촬영하여 사기/홍보에 악용 |
-| **대응** | 히스토리를 서버에 저장하고 서명(HMAC) 검증 |
-
-### CVE-BC-013: 타이머 조작
-
-```js
-vm.timerD = 999; vm.timerH = 23; vm.timerM = 59; vm.timerS = 59
-```
-
-### CVE-BC-014: 당첨자 토스트 데이터 조작
-
-```js
-WINNERS[0] = { nick: '해커***', date: 'Jun.09', prize: 'MEGA JACKPOT', multi: '× 1000', icon: '👑' }
-```
+| **현황** | `SYMBOLS`, `OUTCOME_TABLE` 등이 전역 `window` 스코프에 노출 |
+| **실서비스 영향** | 서버 사이드 결과 판정 후에는 이 데이터들이 UI 참조용으로만 쓰이므로 위험도 낮아짐 |
+| **완화 방법** | IIFE 패턴 또는 ES Module로 전역 노출 최소화 (번들러 사용 시 자동 해결) |
 
 ---
 
-## 🟡 LOW — 보안 모범 사례 위반
-
-### CVE-BC-015: 인라인 이벤트 핸들러 (onerror)
-
-```html
-<img src="assets/bg.webp" onerror="this.style.display='none'">
-```
-CSP `script-src` 정책에 `unsafe-inline`을 허용해야 하므로 보안 수준 저하.
-
-### CVE-BC-016: 프로토타입 오염 (Prototype Pollution)
-
-```js
-Object.prototype.id = "crown"
-// SYMBOLS.find(s => s.id === id) 결과 오염 가능
-```
-
-### CVE-BC-017: 전역 스코프 오염
-
-`SYMBOLS`, `THREE_OF_A_KIND`, `OUTCOME_TABLE`, `calculateWin`, `pickOutcome`, `buildReelsFromOutcome` 등 핵심 함수와 데이터가 모두 전역(window) 스코프에 노출.
-
-### CVE-BC-018: 에러 로깅 없음 (Silent Failures)
-
-사운드 코드의 모든 `catch(e) {}` 블록이 에러를 무시. 공격자의 조작 흔적을 탐지할 수 없음.
-
----
-
-## 🛡️ 종합 대응 방안
+## 🗺️ 실서비스 전환 로드맵
 
 ```mermaid
 graph TD
-    A["현재: 100% 클라이언트 사이드"] --> B["목표: 서버 권한 아키텍처"]
-    B --> C["서버 RNG<br/>crypto.randomBytes()"]
-    B --> D["서버 잔고 관리<br/>DB 트랜잭션"]
-    B --> E["서버 결과 판정<br/>Outcome-First on Server"]
-    B --> F["JWT 인증<br/>세션 검증"]
-    B --> G["API 요청 서명<br/>HMAC 검증"]
-    
-    style A fill:#ff4444,color:#fff
-    style B fill:#22c55e,color:#fff
+    A["현재: 데모\n100% 클라이언트 사이드\nBC = 가상 포인트"] --> B["실서비스 전환"]
+    B --> C["서버 RNG\ncrypto.randomBytes()"]
+    B --> D["서버 잔고 관리\nDB 트랜잭션"]
+    B --> E["서버 결과 판정\nOutcome-First on Server"]
+    B --> F["JWT 인증\n세션 검증"]
+    B --> G["배포 시 처리\nCSP 헤더 + SRI 확인"]
+
+    style A fill:#4b5563,color:#fff
+    style B fill:#7c3aed,color:#fff
+    style G fill:#d97706,color:#fff
 ```
 
-| 우선순위 | 대응 항목 | 효과 |
-|:---:|------|------|
-| 1 | **서버 사이드 게임 로직 이전** | CVE-001~008, 011~014 해결 |
-| 2 | **서버 인증 시스템 도입** | CVE-005 해결 |
-| 3 | **서버 사이드 CSPRNG 사용** | CVE-006 해결 |
-| 4 | **SRI hash 추가** | CVE-009 해결 |
-| 5 | **CSP 헤더 적용** | CVE-011, 015 해결 |
-| 6 | **코드 난독화 + IIFE 패턴** | CVE-003, 008, 017 완화 (우회 가능하지만 난이도 상승) |
-| 7 | **Object.freeze() 적용** | CVE-008 임시 완화 |
-| 8 | **betAmount 서버 검증** | CVE-007, 010 해결 |
+| 우선순위 | 항목 | 시점 | 효과 |
+|:---:|------|:---:|------|
+| 1 | **서버 사이드 게임 로직 이전** (RNG + 결과 판정) | 실서비스 전환 시 | 9건 자동 해소 |
+| 2 | **서버 인증 시스템** (JWT / 세션) | 실서비스 전환 시 | 인증 우회 차단 |
+| 3 | **CSP 헤더 적용** | 배포(웹서버 설정) 시 | XSS → 세션 탈취 방지 |
+| 4 | **SRI hash 확인** | 배포 시 (현재 Vue는 적용됨) | CDN 공급망 공격 방어 |
+| 5 | **당첨자/타이머 서버 API화** | 실서비스 전환 시 | UI 신뢰도 조작 방지 |
 
-> [!IMPORTANT]
-> **핵심 결론**: 현재 아키텍처에서는 **브라우저 DevTools 하나로 모든 게임 로직을 완전히 제어**할 수 있습니다. 실제 재화(BC)가 연동된다면, 게임 결과 결정(RNG), 잔고 관리, 인증을 반드시 서버 사이드로 이전해야 합니다. 클라이언트는 **애니메이션 재생기**로만 사용해야 합니다.
+---
+
+> [!NOTE]
+> **현재 데모 단계 결론**: BC가 실제 재화가 아니고 로컬 환경에서 동작하는 한, 위의 취약점들은 실질적 피해를 유발하지 않습니다. 실서비스 전환(백엔드 연동) 시점에 서버 사이드 아키텍처를 채택하면 대부분 구조적으로 해소되며, CSP·SRI는 배포 단계에서 웹서버 설정으로 처리하면 됩니다.
