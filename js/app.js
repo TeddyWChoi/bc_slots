@@ -28,10 +28,7 @@ const TWO_OF_A_KIND = { smile: 2, skull: 5, crown: 10 };
 // 2매치 본전(×1): Helmet / Knife / Grenade / Pistol
 const BREAK_TWO_SET = new Set(['helmet', 'knife', 'grenade', 'pistol']);
 
-const SPECIAL_COMBOS = [
-  { ids: ['crown', 'skull', 'crown'], multi: 200, tier: 'jackpot' },
-  { ids: ['skull', 'smile', 'skull'], multi: 50,  tier: 'big'     },
-];
+// 스페셜 콤보 제거됨 (v2.1 — 룰 테이블 미포함)
 
 // ============================================================================
 // 결과 가중치 테이블 (결과가중치테이블.md 기준 · 총 100,000)
@@ -45,9 +42,6 @@ const OUTCOME_TABLE = [
   { type: '3match', id: 'knife',   weight: 240 },  // ×15   MED
   { type: '3match', id: 'grenade', weight: 428 },  // ×8    SMALL
   { type: '3match', id: 'pistol',  weight: 892 },  // ×5    SMALL
-  // 스페셜 콤보
-  { type: 'special', id: 0,        weight: 5   },  // Crown-Skull-Crown ×200
-  { type: 'special', id: 1,        weight: 15  },  // Skull-Smile-Skull ×50
   // 2매치 당첨
   { type: '2match', id: 'crown',   weight: 563 },  // ×10
   { type: '2match', id: 'skull',   weight: 928 },  // ×5
@@ -59,8 +53,8 @@ const OUTCOME_TABLE = [
   { type: 'break',  id: 'pistol',  weight: 9025 }, // ×1
   // 프리스핀
   { type: 'respin', id: 'mystery', weight: 5000 }, // Free Spin 5%
-  // 꽝
-  { type: 'miss',   id: null,      weight: 53480 }, // Miss 53.48%
+  // 꽝 (스페셜 콤보 제거분 20 흡수 → 53500)
+  { type: 'miss',   id: null,      weight: 53500 }, // Miss 53.50%
 ];
 const OUTCOME_TOTAL = OUTCOME_TABLE.reduce((a, o) => a + o.weight, 0);
 
@@ -76,9 +70,6 @@ const TEST_OUTCOME_TABLE = [
   { type: '3match', id: 'knife',   weight: 5000 },  // MED     ×15
   { type: '3match', id: 'grenade', weight: 5000 },  // SMALL   ×8
   { type: '3match', id: 'pistol',  weight: 5000 },  // SMALL   ×5
-  // 스페셜 콤보 (테스트: 상향)
-  { type: 'special', id: 0,        weight: 3000 },  // Crown-Skull-Crown ×200
-  { type: 'special', id: 1,        weight: 3000 },  // Skull-Smile-Skull ×50
   // 2매치 당첨
   { type: '2match', id: 'crown',   weight: 3000 },  // ×10
   { type: '2match', id: 'skull',   weight: 3000 },  // ×5
@@ -134,11 +125,6 @@ function formatDate(d) {
 }
 
 function calculateWin(reels, bet) {
-  for (const c of SPECIAL_COMBOS) {
-    if (reels[0].id === c.ids[0] && reels[1].id === c.ids[1] && reels[2].id === c.ids[2]) {
-      return { winAmount: c.multi * bet, multiplier: c.multi, tier: c.tier };
-    }
-  }
   if (reels[0].id === reels[1].id && reels[1].id === reels[2].id) {
     const t = THREE_OF_A_KIND[reels[0].id];
     if (t) return { winAmount: t.multi * bet, multiplier: t.multi, tier: t.tier };
@@ -187,11 +173,6 @@ function buildReelsFromOutcome(outcome) {
     const s = symOf(outcome.id);
     const others = nonMystery.filter(x => x.id !== outcome.id);
     return [s, s, rand(others)];
-  }
-  if (outcome.type === 'special') {
-    // SPECIAL_COMBOS[outcome.id]의 심볼 조합을 그대로 반환
-    const combo = SPECIAL_COMBOS[outcome.id];
-    return combo.ids.map(id => symOf(id));
   }
   if (outcome.type === 'respin') {
     // ❓ 는 세 번째 릴에만 등장
